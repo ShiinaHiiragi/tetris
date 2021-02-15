@@ -1,0 +1,19 @@
+{
+  "name": "tetris",
+  "version": "0.0.1",
+  "description": "A electron application for new Tetris.",
+  "main": "index.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "keywords": [
+    "Tetris",
+    "electron"
+  ],
+  "author": "Ichinoe",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^11.2.3",
+    "semantic-ui": "^2.4.2"
+  }
+}

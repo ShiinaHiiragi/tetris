@@ -181,10 +181,10 @@
         var bias = Setting.pieces[this.type][this.direction];
         if (center[0] >= 0)
           Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[clear ? this.type : 0];
-        Panel.cells[center[0] + 4][center[1]] = 1;
+        Panel.cells[center[0] + 4][center[1]] = clear ? 1 : 0;
         for (var index = 0; index < 3; index += 1) {
           var bias = Setting.pieces[this.type][this.direction][index];
-          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = 1;
+          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = clear ? 1 : 0;
           if (center[0] + bias[0] >= 0)
             Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
               Setting.color[clear ? this.type : 0];
@@ -222,6 +222,14 @@
             next.position[1] += Setting.align[this.direction + index][1];
           }
       }
+      
+      // pos: a bias array (down: [1, 0])
+      shift(next, pos)
+      {
+        next.position = [this.position[0] + pos[0], this.position[1] + pos[1]];
+        next.type = this.type;
+        next.direction = this.direction;
+      }
 
       // check where to place the piece
       kickWall()
@@ -229,6 +237,7 @@
       }
     }
     now = new Piece([10, 5], 6, 0);
+    next = new Piece();
 
     function init()
     {

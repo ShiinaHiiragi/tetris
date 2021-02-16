@@ -52,6 +52,9 @@
     <div class="field" id="field"></div>
     <div class="side" id="right-side">
       <!-- TODO: Next Pieces Here -->
+      <div class="ui container">
+        <button class="ui button" style="margin-left: 20px" onclick="init()"> Start </button>
+      </div>
     </div>
   </div>
   <script>
@@ -63,97 +66,61 @@
     {
       var str = element.id.split("-");
       var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
-      element.style.backgroundColor = Settings.color[index % 8];
+      element.style.backgroundColor = Setting.color[index % 8];
       // used for manipulating transparency
       // element.style.opacity = "0.5";
     }
 
     // TODO: initializing variables from settings.json
-    var Settings =
+    var Setting =
     {
       color:
-      [
-        "rgb(225, 225, 225)", "rgb(252, 92, 101)",
-        "rgb(253, 150, 68)", "rgb(254, 211, 48)",
-        "rgb(38, 222, 129)", "rgb(69, 170, 242)",
-        "rgb(75, 123, 236)", "rgb(165, 94, 234)"
-      ],
+        [
+          "rgb(225, 225, 225)", "rgb(252, 92, 101)",
+          "rgb(253, 150, 68)", "rgb(254, 211, 48)",
+          "rgb(38, 222, 129)", "rgb(69, 170, 242)",
+          "rgb(75, 123, 236)", "rgb(165, 94, 234)"
+        ],
       pieces:
-      [
-        null,
         [
-          [[0, -1], [-1, -1], [-1, 0]], [[-1, 0], [-1, 1], [0, 1]],
-          [[0, 1], [1, 1], [1, 0]], [[1, 0], [1, -1], [0, -1]]
+          null,
+          [
+            [[0, -1], [-1, -1], [-1, 0]], [[-1, 0], [-1, 1], [0, 1]],
+            [[0, 1], [1, 1], [1, 0]], [[1, 0], [1, -1], [0, -1]]
+          ],
+          [
+            [[0, 1], [0, -1], [-1, 1]], [[1, 0], [-1, 0], [1, 1]],
+            [[0, -1], [0, 1], [1, -1]], [[-1, 0], [1, 0], [-1, -1]]
+          ],
+          [
+            [[0, 1], [0, -1], [-1, -1]], [[1, 0], [-1, 0], [-1, 1]],
+            [[0, -1], [0, 1], [1, 1]], [[-1, 0], [1, 0], [1, -1]]
+          ],
+          [
+            [[0, 1], [0, -1], [-1, 0]], [[1, 0], [-1, 0], [0, 1]],
+            [[0, -1], [0, 1], [1, 0]], [[-1, 0], [1, 0], [0, -1]]
+          ],
+          [
+            [[0, -1], [-1, 0], [-1, 1]], [[-1, 0], [0, 1], [1, 1]],
+            [[0, 1], [1, 0], [1, -1]], [[1, 0], [0, -1], [-1, -1]]
+          ],
+          [
+            [[0, 1], [-1, -1], [-1, 0]], [[1, 0], [-1, 1], [0, 1]],
+            [[0, -1], [1, 1], [1, 0]], [[-1, 0], [1, -1], [0, -1]]
+          ],
+          [
+            [[0, 1], [0, -1], [0, -2]], [[1, 0], [-1, 0], [-2, 0]],
+            [[0, -1], [0, 1], [0, 2]], [[-1, 0], [1, 0], [2, 0]]
+          ]
         ],
-        [
-          [[0, 1], [0, -1], [-1, 1]], [[1, 0], [-1, 0], [1, 1]],
-          [[0, -1], [0, 1], [1, -1]], [[-1, 0], [1, 0], [-1, -1]]
-        ],
-        [
-          [[0, 1], [0, -1], [-1, -1]], [[1, 0], [-1, 0], [-1, 1]],
-          [[0, -1], [0, 1], [1, 1]], [[-1, 0], [1, 0], [1, -1]]
-        ],
-        [
-          [[0, 1], [0, -1], [-1, 0]], [[1, 0], [-1, 0], [0, 1]],
-          [[0, -1], [0, 1], [1, 0]], [[-1, 0], [1, 0], [0, -1]]
-        ],
-        [
-          [[0, -1], [-1, 0], [-1, 1]], [[-1, 0], [0, 1], [1, 1]],
-          [[0, 1], [1, 0], [1, -1]], [[1, 0], [0, -1], [-1, -1]]
-        ],
-        [
-          [[0, 1], [-1, -1], [-1, 0]], [[1, 0], [-1, 1], [0, 1]],
-          [[0, -1], [1, 1], [1, 0]], [[-1, 0], [1, -1], [0, -1]]
-        ],
-        [
-          [[0, 1], [0, -1], [0, -2]], [[1, 0], [-1, 0], [-2, 0]],
-          [[0, -1], [0, 1], [0, 2]], [[-1, 0], [1, 0], [2, 0]]
-        ]
-      ],
       fallTime: 1
     }
     // process raw setting in the file
     // fallTime: 1 ~ 10; 1: 1000ms, 10: 100ms
-    Settings.fallTime = 1100 - Settings.fallTime * 100;
-
-    // Panel: The cell and the data of Tetris
-    var Panel = 
-    {
-      cells: new Array(24),
-      score: 0,
-      line: 0
-    }
-    // process raw panel data
-    for (var i = 0; i < 24; i += 1)
-      Panel.cells[i] = new Array(10).fill(0);
-
-    // Piece: The block available for manipupating
-    var Piece = 
-    {
-      // the position of top left corner is [4, 0]
-      position: [10, 3],
-      // type: 1 ~ 7; O, L, J, T, S, Z, I
-      type: 2,
-      // direction: 0 ~ 3
-      direction: 0,
-      // draw the piece on the panel and the array
-      draw: function()
-      {
-        var center = [this.position[0] - 4, this.position[1]];
-        var bias = Settings.pieces[this.type][this.direction];
-        Cite.cells[center[0]][center[1]].style.backgroundColor = Settings.color[this.type];
-        Panel.cells[center[0] + 4][center[1]] = 1;
-        for (var index = 0; index < 3; index += 1)
-        {
-          var bias = Settings.pieces[this.type][this.direction][index];
-          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = 1;
-          Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor = Settings.color[this.type];
-        }
-      }
-    }
+    Setting.fallTime = 1100 - Setting.fallTime * 100;
 
     // Cite: the element in the HTML DOM
-    var Cite = 
+    var Cite =
     {
       // field: a cite for field
       field: document.getElementById("field"),
@@ -173,6 +140,96 @@
         Cite.cells[i][j].setAttribute("onclick", "setColor(this)")
         Cite.field.append(Cite.cells[i][j]);
       }
+
+    // Panel: The cell and the data of Tetris
+    var Panel =
+    {
+      cells: new Array(24),
+      score: 0,
+      line: 0
+    }
+    // process raw panel data
+    for (var i = 0; i < 24; i += 1)
+      Panel.cells[i] = new Array(10).fill(0);
+
+    // Piece: The block available for manipupating
+    class Piece
+    {
+      constructor(pos, type, direct)
+      {
+        // the position of top left corner is [4, 0]
+        this.position = pos;
+        // type: 1 ~ 7; O, L, J, T, S, Z, I
+        this.type = type;
+        // direction: 0 ~ 3
+        this.direction = direct;
+      }
+
+      // draw the piece on the panel and the array
+      // please check() it before using this function
+      draw()
+      {
+        var center = [this.position[0] - 4, this.position[1]];
+        var bias = Setting.pieces[this.type][this.direction];
+        if (center[0] >= 0)
+          Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[this.type];
+        Panel.cells[center[0] + 4][center[1]] = 1;
+        for (var index = 0; index < 3; index += 1) {
+          var bias = Setting.pieces[this.type][this.direction][index];
+          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = 1;
+          if (center[0] + bias[0] >= 0)
+            Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
+              Setting.color[this.type];
+        }
+      }
+
+      // check if there is any collision
+      // out of the panel or existed pieces
+      check()
+      {
+        var center = [this.position[0] - 4, this.position[1]];
+        var bias = Setting.pieces[this.type][this.direction];
+        if (center[0] < -4 || center[0] > 19 || center[1] < 0 || center[1] > 9) return false;
+        if (Panel.cells[center[0] + 4][center[1]]) return false;
+        for (var index = 0; index < 3; index += 1)
+        {
+          var bias = Setting.pieces[this.type][this.direction][index];
+          if (center[0] + bias[0] < -4 || center[0] + bias[0] > 19 ||
+            center[1] + bias[1] < 0 || center[1] + bias[1] > 9) return false;
+          if (Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]]) return false;
+        }
+        return true;
+      }
+
+      // direct: 1(90) / -1(-90) / 2(180)
+      rotate(next, direct)
+      {
+        next.position[0] = this.position[0];
+        next.position[1] = this.position[1];
+        next.type = this.type;
+        next.direction = (this.direction + direct + 4) % 4;
+        if (this.type == 1)
+        {
+        }
+        else if (this.type == 7)
+        {
+        }
+      }
+
+      // check where to place the piece
+      kickWall()
+      {
+      }
+    }
+    now = new Piece([4, 0], 7, 1);
+    next = new Piece();
+
+    function init()
+    {
+      console.log(now.check());
+      now.draw();
+    }
   </script>
 </body>
+
 </html>

@@ -62,14 +62,13 @@
     function setColor(element)
     {
       var str = element.id.split("-");
-      var index = (cellsColor[Number(str[1]) - 1][Number(str[2]) - 1] += 1);
+      var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
       element.style.backgroundColor = Settings.color[index % 8];
       // used for manipulating transparency
       // element.style.opacity = "0.5";
     }
 
     // TODO: initializing variables from settings.json
-    // 1 ~ 7: O, L, J, T, S, Z, I
     var Settings =
     {
       color:
@@ -81,6 +80,7 @@
       ],
       pieces:
       [
+        null,
         [
           [[0, -1], [-1, -1], [-1, 0]], [[-1, 0], [-1, 1], [0, 1]],
           [[0, 1], [1, 1], [1, 0]], [[1, 0], [1, -1], [0, -1]]
@@ -119,24 +119,36 @@
     // Panel: The cell and the data of Tetris
     var Panel = 
     {
-      cells: new Array(23),
+      cells: new Array(24),
       score: 0,
       line: 0
     }
     // process raw panel data
-    for (var i = 0; i < 23; i += 1)
+    for (var i = 0; i < 24; i += 1)
       Panel.cells[i] = new Array(10).fill(0);
 
     // Piece: The block available for manipupating
     var Piece = 
     {
-      // the position of top left corner is [3, 0]
+      // the position of top left corner is [4, 0]
       position: [10, 3],
-      type: 1,
+      // type: 1 ~ 7; O, L, J, T, S, Z, I
+      type: 2,
+      // direction: 0 ~ 3
       direction: 0,
+      // draw the piece on the panel and the array
       draw: function()
       {
-        // TODO: draw cells in color
+        var center = [this.position[0] - 4, this.position[1]];
+        var bias = Settings.pieces[this.type][this.direction];
+        Cite.cells[center[0]][center[1]].style.backgroundColor = Settings.color[this.type];
+        Panel.cells[center[0] + 4][center[1]] = 1;
+        for (var index = 0; index < 3; index += 1)
+        {
+          var bias = Settings.pieces[this.type][this.direction][index];
+          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = 1;
+          Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor = Settings.color[this.type];
+        }
       }
     }
 
@@ -156,13 +168,11 @@
       {
         Cite.cells[i][j] = document.createElement("div");
         Cite.cells[i][j].className = "cell";
-        Cite.cells[i][j].id = "cell-" + (i + 1).toString() + "-" + (j + 1).toString();
+        Cite.cells[i][j].id = "cell-" + i.toString() + "-" + j.toString();
         // TODO: delete this arrtibute before realeasing
         Cite.cells[i][j].setAttribute("onclick", "setColor(this)")
         Cite.field.append(Cite.cells[i][j]);
       }
-
-    
   </script>
 </body>
 </html>

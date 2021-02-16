@@ -81,6 +81,15 @@
           "rgb(38, 222, 129)", "rgb(69, 170, 242)",
           "rgb(75, 123, 236)", "rgb(165, 94, 234)"
         ],
+      fallTime: 1
+    }
+    // process raw setting in the file
+    // fallTime: 1 ~ 10; 1: 1000ms, 10: 100ms
+    Setting.fallTime = 1100 - Setting.fallTime * 100;
+
+    // System: important logic data, which cannot be changed by user
+    var System =
+    {
       pieces:
         [
           null,
@@ -114,11 +123,25 @@
           ]
         ],
       align: [[1, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [0, -1]],
-      fallTime: 1
+      firstBag: null,
+      secondBag: null,
+      shuffle: null,
+      shuffleInit: function ()
+      {
+        this.firstBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
+        this.secondBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
+        this.shuffle = this.firstBag.concat(this.secondBag);
+      },
+      shuffleRefresh: function()
+      {
+        this.shufflePointer = 0;
+        this.firstBag = this.secondBag;
+        this.secondBag = null;
+        this.secondBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
+        this.shuffle = this.firstBag.concat(this.secondBag);
+      },
+      shufflePointer: 0
     }
-    // process raw setting in the file
-    // fallTime: 1 ~ 10; 1: 1000ms, 10: 100ms
-    Setting.fallTime = 1100 - Setting.fallTime * 100;
 
     // Cite: the element in the HTML DOM
     var Cite =
@@ -178,12 +201,12 @@
       draw(clear)
       {
         var center = [this.position[0] - 4, this.position[1]];
-        var bias = Setting.pieces[this.type][this.direction];
+        var bias = System.pieces[this.type][this.direction];
         if (center[0] >= 0)
           Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[clear ? this.type : 0];
         Panel.cells[center[0] + 4][center[1]] = clear ? 1 : 0;
         for (var index = 0; index < 3; index += 1) {
-          var bias = Setting.pieces[this.type][this.direction][index];
+          var bias = System.pieces[this.type][this.direction][index];
           Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = clear ? 1 : 0;
           if (center[0] + bias[0] >= 0)
             Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
@@ -196,12 +219,12 @@
       check()
       {
         var center = [this.position[0] - 4, this.position[1]];
-        var bias = Setting.pieces[this.type][this.direction];
+        var bias = System.pieces[this.type][this.direction];
         if (center[0] < -4 || center[0] > 19 || center[1] < 0 || center[1] > 9) return false;
         if (Panel.cells[center[0] + 4][center[1]]) return false;
         for (var index = 0; index < 3; index += 1)
         {
-          var bias = Setting.pieces[this.type][this.direction][index];
+          var bias = System.pieces[this.type][this.direction][index];
           if (center[0] + bias[0] < -4 || center[0] + bias[0] > 19 ||
             center[1] + bias[1] < 0 || center[1] + bias[1] > 9) return false;
           if (Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]]) return false;
@@ -218,8 +241,8 @@
         if (this.type == 1 || this.type == 7)
           for (var index = 0; index < direct; index += 1)
           {
-            next.position[0] += Setting.align[this.direction + index][0];
-            next.position[1] += Setting.align[this.direction + index][1];
+            next.position[0] += System.align[this.direction + index][0];
+            next.position[1] += System.align[this.direction + index][1];
           }
       }
       
@@ -230,13 +253,8 @@
         next.type = this.type;
         next.direction = this.direction;
       }
-
-      // check where to place the piece
-      kickWall()
-      {
-      }
     }
-    now = new Piece([10, 5], 6, 0);
+    now = new Piece();
     next = new Piece();
 
     function init()

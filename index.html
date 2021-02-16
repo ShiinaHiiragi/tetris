@@ -81,14 +81,21 @@
           "rgb(38, 222, 129)", "rgb(69, 170, 242)",
           "rgb(75, 123, 236)", "rgb(165, 94, 234)"
         ],
-      fallTime: 1,
-      lockTime: 5
+      keyDownCode:
+      {
+        left: 37, right: 39, hold: 16,
+        leftHalf: 88, rightHalf: 67,
+        leftQuarter: 90, rightQuarter: 86,
+        hardDrop: 38, softDrop: 40
+      },
+      fallTime: 800,
+      lockTime: 500
     }
     // process raw setting in the file
     // fallTime: 1 ~ 10; 1: 100ms, 10: 10ms
     // lockTime: 1 ~ 10; 1: 1000ms, 10: 100ms
-    Setting.fallTime = 110 - Setting.fallTime * 10;
-    Setting.lockTime = 1100 - Setting.lockTime * 100;
+    // Setting.fallTime = 110 - Setting.fallTime * 10;
+    // Setting.lockTime = 1100 - Setting.lockTime * 100;
 
     // System: important logic data, which cannot be changed by user
     var System =
@@ -125,13 +132,28 @@
             [[0, -1], [0, 1], [0, 2]], [[-1, 0], [1, 0], [2, 0]]
           ]
         ],
+      // kickWall = [I_clock, I_counter, JLSTZ_clock, JLSTZ_counter]
+      kickWall:
+      [
+        [
+          [[0, 1], [0, -2], [2, 1], [-1, -2]], [[0, -2], [0, 1], [1, -2], [-2, 1]],
+          [[0, -1], [0, 2], [-2, -1], [1, 2]], [[0, 2], [0, -1], [-1, 2], [2, -1]]
+        ],
+        [
+          [[0, 2], [0, -1], [-1, 2], [2, -1]], [[0, 1], [0, -2], [2, 1], [-1, -2]],
+          [[0, -2], [0, 1], [1, -2], [-2, 1]], [[0, -1], [0, 2], [-2, -1], [1, 2]]
+        ],
+        [
+          [[0, -1], [1, -1], [-2, 0], [-2, -1]], [[0, -1], [-1, -1], [2, 0], [2, -1]],
+          [[0, 1], [1, 1], [-2, 0], [-2, 1]], [[0, 1], [-1, 1], [2, 0], [2, 1]]
+        ],
+        [
+          [[0, 1], [1, 1], [-2, 0], [-2, 1]], [[0, -1], [-1, -1], [2, 0], [2, -1]],
+          [[0, -1], [1, -1], [-2, 0], [-2, -1]], [[0, 1], [-1, 1], [2, 0], [2, 1]]
+        ]
+      ],
       align: [[1, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [0, -1]],
       positionInit: [null, [2, 5], [3, 4], [3, 4], [3, 4], [3, 4], [3, 4], [3, 5]],
-      keyDownCode:
-      {
-        z: 90, x: 88, c: 67, shift: 16,
-        left: 37, up: 38, right: 39, down: 40
-      },
       lastSpin: false,
       falldownClock: null,
       lockdownClock: null,
@@ -179,12 +201,7 @@
       }
 
     // Panel: The cell and the data of Tetris
-    var Panel =
-    {
-      cells: new Array(24),
-      score: 0,
-      line: 0
-    }
+    var Panel = {cells: new Array(24), score: 0, line: 0}
     // process raw panel data
     for (var i = 0; i < 24; i += 1)
       Panel.cells[i] = new Array(10).fill(0);
@@ -217,7 +234,6 @@
       }
 
       // draw the piece on the panel and the array
-      // please check() it before using this function
       // clear: true: print, false: clear
       // heap: true: solid, false: not solid
       draw(clear, heap)
@@ -254,9 +270,20 @@
         return true;
       }
 
-      // direct: 1(90) / 2(180) / 3(-90)
-      rotate(next, direct)
+      // pos: a bias array (down: [1, 0])
+      shift(next, pos)
       {
+        next.position = [this.position[0] + pos[0], this.position[1] + pos[1]];
+        next.type = this.type;
+        next.direction = this.direction;
+        return next.check();
+      }
+
+      // direct: 1(90) / 2(180) / 3(-90)
+      // right: true: clockwise, false: counterclockwise
+      rotate(next, direct, right)
+      {
+        var kickType = null;
         next.position = [this.position[0], this.position[1]];
         next.type = this.type;
         next.direction = (this.direction + direct) % 4;
@@ -266,29 +293,36 @@
             next.position[0] += System.align[this.direction + index][0];
             next.position[1] += System.align[this.direction + index][1];
           }
-      }
-      
-      // pos: a bias array (down: [1, 0])
-      shift(next, pos)
-      {
-        next.position = [this.position[0] + pos[0], this.position[1] + pos[1]];
-        next.type = this.type;
-        next.direction = this.direction;
+        if (next.check()) return true;
+        else if (this.type == 7) kickType = (right ? System.kickWall[0] : System.kickWall[1]);
+        else kickType = (right ? System.kickWall[2] : System.kickWall[3]);
+        for (var index = 0; index < 4; index += 1)
+        {
+          next.shift(Pieces.try, kickType[next.direction][index]);
+          if (Pieces.try.check())
+          {
+            next.copy(Pieces.try);
+            return true;
+          }
+        }
+        return false;
       }
     }
-    var Pieces = {now: new Piece(), next: new Piece(), preview: new Piece()}
+    var Pieces = {now: new Piece(), next: new Piece(), try: new Piece(), preview: new Piece()}
+
+    function updateNow()
+    {
+      Pieces.now.draw(false, false);
+      Pieces.next.draw(true, false);
+      Pieces.now.copy(Pieces.next);
+    }
 
     function naturalFalldown()
     {
-      Pieces.now.shift(Pieces.next, [1, 0]);
-      if (Pieces.next.check())
-      {
-        Pieces.now.draw(false, false);
-        Pieces.next.draw(true, false);
-        Pieces.now.copy(Pieces.next);
-      }
+      if (Pieces.now.shift(Pieces.next, [1, 0])) updateNow()
       else
       {
+        console.log("lockdownTime");
         System.falldownClock = window.clearInterval(System.falldownClock);
         System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
       }
@@ -296,22 +330,74 @@
 
     function lockdownDelay()
     {
-      Pieces.now.draw(true, true);
-      Pieces.now.init(System.shuffle[++System.shufflePointer]);
-      if (System.shufflePointer == 7) System.shuffleRefresh();
-      Pieces.now.draw(true, false);
-      System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
+      if (Pieces.now.shift(Pieces.next, [1, 0]))
+      {
+        updateNow();
+        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+      }
+      else
+      {
+        Pieces.now.draw(true, true);
+        Pieces.now.init(System.shuffle[++System.shufflePointer]);
+        if (System.shufflePointer == 7) System.shuffleRefresh();
+        Pieces.now.draw(true, false);
+        System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
+      }
     }
 
     function keyboardEvent(event)
     {
-      if (event.keyCode == System.keyDownCode.c)
+      if (event.keyCode == Setting.keyDownCode.leftQuarter ||
+          event.keyCode == Setting.keyDownCode.leftHalf ||
+          event.keyCode == Setting.keyDownCode.rightHalf ||
+          event.keyCode == Setting.keyDownCode.rightQuarter)
       {
+        // used for judging T-Spin
+        System.lastSpin = true;
+        // reset lockdownClock
         if (System.falldownClock == undefined)
         {
-          // reset lockdownClock
           window.clearTimeout(System.lockdownClock);
           System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+        }
+        var second;
+        if (event.keyCode == Setting.keyDownCode.rightQuarter) second = 1;
+        else if (event.keyCode == Setting.keyDownCode.leftQuarter) second = 3;
+        else second = 2;
+        var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
+                     event.keyCode == Setting.keyDownCode.rightQuarter);
+        if (Pieces.now.rotate(Pieces.next, second, third)) updateNow()
+      }
+      else if (event.keyCode == Setting.keyDownCode.left ||
+               event.keyCode == Setting.keyDownCode.right)
+      {
+        System.lastSpin = false;
+        if (System.falldownClock == undefined)
+        {
+          window.clearTimeout(System.lockdownClock);
+          System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+        }
+        if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
+          updateNow();
+      }
+      else if (event.keyCode == Setting.keyDownCode.hold ||
+               event.keyCode == Setting.keyDownCode.softDrop ||
+               event.keyCode == Setting.keyDownCode.hardDrop)
+      {
+        System.lastSpin = false;
+        if (event.keyCode == Setting.keyDownCode.softDrop)
+        {
+          if (Pieces.now.shift(Pieces.next, [1, 0]))
+            updateNow();
+        }
+        else if (event.keyCode == Setting.keyDownCode.hardDrop)
+        {
+          Pieces.next.copy(Pieces.now);
+          while (Pieces.next.shift(Pieces.try, [1, 0]))
+            Pieces.next.copy(Pieces.try);
+          updateNow();
+          System.falldownClock = window.clearInterval(System.falldownClock);
+          lockdownDelay();
         }
       }
     }

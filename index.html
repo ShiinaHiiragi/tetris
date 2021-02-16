@@ -53,23 +53,23 @@
     <div class="side" id="right-side">
       <!-- TODO: Next Pieces Here -->
       <div class="ui container">
-        <button class="ui button" style="margin-left: 20px" onclick="init()"> Start </button>
+        <button class="ui button" style="margin-left: 20px" onclick="initialize()"> Start </button>
       </div>
     </div>
   </div>
   <script>
     // TODO: delete these variables after releasing
-    var cellsColor = new Array(20);
-    for (var i = 0; i < 20; i += 1)
-      cellsColor[i] = new Array(10).fill(0);
-    function setColor(element)
-    {
-      var str = element.id.split("-");
-      var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
-      element.style.backgroundColor = Setting.color[index % 8];
-      // used for manipulating transparency
-      // element.style.opacity = "0.5";
-    }
+    // var cellsColor = new Array(20);
+    // for (var i = 0; i < 20; i += 1)
+    //   cellsColor[i] = new Array(10).fill(0);
+    // function setColor(element)
+    // {
+    //   var str = element.id.split("-");
+    //   var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
+    //   element.style.backgroundColor = Setting.color[index % 8];
+    //   // used for manipulating transparency
+    //   // element.style.opacity = "0.5";
+    // }
 
     // TODO: initializing variables from settings.json
     var Setting =
@@ -81,11 +81,14 @@
           "rgb(38, 222, 129)", "rgb(69, 170, 242)",
           "rgb(75, 123, 236)", "rgb(165, 94, 234)"
         ],
-      fallTime: 1
+      fallTime: 1,
+      lockTime: 5
     }
     // process raw setting in the file
-    // fallTime: 1 ~ 10; 1: 1000ms, 10: 100ms
-    Setting.fallTime = 1100 - Setting.fallTime * 100;
+    // fallTime: 1 ~ 10; 1: 100ms, 10: 10ms
+    // lockTime: 1 ~ 10; 1: 1000ms, 10: 100ms
+    Setting.fallTime = 110 - Setting.fallTime * 10;
+    Setting.lockTime = 1100 - Setting.lockTime * 100;
 
     // System: important logic data, which cannot be changed by user
     var System =
@@ -123,11 +126,21 @@
           ]
         ],
       align: [[1, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [0, -1]],
+      positionInit: [null, [2, 5], [3, 4], [3, 4], [3, 4], [3, 4], [3, 4], [3, 5]],
+      keyDownCode:
+      {
+        z: 90, x: 88, c: 67, shift: 16,
+        left: 37, up: 38, right: 39, down: 40
+      },
+      lastSpin: false,
+      falldownClock: null,
+      lockdownClock: null,
       firstBag: null,
       secondBag: null,
       shuffle: null,
       shuffleInit: function ()
       {
+        this.shufflePointer = 0;
         this.firstBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
         this.secondBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
         this.shuffle = this.firstBag.concat(this.secondBag);
@@ -189,6 +202,13 @@
         this.direction = direct;
       }
 
+      init(index)
+      {
+        this.type = index;
+        this.direction = 0;
+        this.position = [System.positionInit[index][0], System.positionInit[index][1]];
+      }
+
       copy(right)
       {
         this.position = [right.position[0], right.position[1]];
@@ -198,16 +218,18 @@
 
       // draw the piece on the panel and the array
       // please check() it before using this function
-      draw(clear)
+      // clear: true: print, false: clear
+      // heap: true: solid, false: not solid
+      draw(clear, heap)
       {
         var center = [this.position[0] - 4, this.position[1]];
         var bias = System.pieces[this.type][this.direction];
         if (center[0] >= 0)
           Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[clear ? this.type : 0];
-        Panel.cells[center[0] + 4][center[1]] = clear ? 1 : 0;
+        Panel.cells[center[0] + 4][center[1]] = clear ? (heap ? 2 : 1) : 0;
         for (var index = 0; index < 3; index += 1) {
           var bias = System.pieces[this.type][this.direction][index];
-          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = clear ? 1 : 0;
+          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = clear ? (heap ? 2 : 1) : 0;
           if (center[0] + bias[0] >= 0)
             Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
               Setting.color[clear ? this.type : 0];
@@ -221,13 +243,13 @@
         var center = [this.position[0] - 4, this.position[1]];
         var bias = System.pieces[this.type][this.direction];
         if (center[0] < -4 || center[0] > 19 || center[1] < 0 || center[1] > 9) return false;
-        if (Panel.cells[center[0] + 4][center[1]]) return false;
+        if (Panel.cells[center[0] + 4][center[1]] == 2) return false;
         for (var index = 0; index < 3; index += 1)
         {
           var bias = System.pieces[this.type][this.direction][index];
           if (center[0] + bias[0] < -4 || center[0] + bias[0] > 19 ||
             center[1] + bias[1] < 0 || center[1] + bias[1] > 9) return false;
-          if (Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]]) return false;
+          if (Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] == 2) return false;
         }
         return true;
       }
@@ -254,11 +276,53 @@
         next.direction = this.direction;
       }
     }
-    now = new Piece();
-    next = new Piece();
+    var Pieces = {now: new Piece(), next: new Piece(), preview: new Piece()}
 
-    function init()
+    function naturalFalldown()
     {
+      Pieces.now.shift(Pieces.next, [1, 0]);
+      if (Pieces.next.check())
+      {
+        Pieces.now.draw(false, false);
+        Pieces.next.draw(true, false);
+        Pieces.now.copy(Pieces.next);
+      }
+      else
+      {
+        System.falldownClock = window.clearInterval(System.falldownClock);
+        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+      }
+    }
+
+    function lockdownDelay()
+    {
+      Pieces.now.draw(true, true);
+      Pieces.now.init(System.shuffle[++System.shufflePointer]);
+      if (System.shufflePointer == 7) System.shuffleRefresh();
+      Pieces.now.draw(true, false);
+      System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
+    }
+
+    function keyboardEvent(event)
+    {
+      if (event.keyCode == System.keyDownCode.c)
+      {
+        if (System.falldownClock == undefined)
+        {
+          // reset lockdownClock
+          window.clearTimeout(System.lockdownClock);
+          System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+        }
+      }
+    }
+
+    function initialize()
+    {
+      System.shuffleInit();
+      Pieces.now.init(System.shuffle[System.shufflePointer]);
+      Pieces.now.draw(true, false);
+      document.addEventListener('keydown', keyboardEvent);
+      System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
     }
   </script>
 </body>

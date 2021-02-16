@@ -85,8 +85,8 @@
         [
           null,
           [
-            [[0, -1], [-1, -1], [-1, 0]], [[-1, 0], [-1, 1], [0, 1]],
-            [[0, 1], [1, 1], [1, 0]], [[1, 0], [1, -1], [0, -1]]
+            [[1, 0], [1, -1], [0, -1]], [[0, -1], [-1, -1], [-1, 0]],
+            [[-1, 0], [-1, 1], [0, 1]], [[0, 1], [1, 1], [1, 0]]
           ],
           [
             [[0, 1], [0, -1], [-1, 1]], [[1, 0], [-1, 0], [1, 1]],
@@ -113,6 +113,7 @@
             [[0, -1], [0, 1], [0, 2]], [[-1, 0], [1, 0], [2, 0]]
           ]
         ],
+      align: [[1, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [0, -1]],
       fallTime: 1
     }
     // process raw setting in the file
@@ -165,21 +166,28 @@
         this.direction = direct;
       }
 
+      copy(right)
+      {
+        this.position = [right.position[0], right.position[1]];
+        this.type = right.type;
+        this.direction = right.direction;
+      }
+
       // draw the piece on the panel and the array
       // please check() it before using this function
-      draw()
+      draw(clear)
       {
         var center = [this.position[0] - 4, this.position[1]];
         var bias = Setting.pieces[this.type][this.direction];
         if (center[0] >= 0)
-          Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[this.type];
+          Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[clear ? this.type : 0];
         Panel.cells[center[0] + 4][center[1]] = 1;
         for (var index = 0; index < 3; index += 1) {
           var bias = Setting.pieces[this.type][this.direction][index];
           Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = 1;
           if (center[0] + bias[0] >= 0)
             Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
-              Setting.color[this.type];
+              Setting.color[clear ? this.type : 0];
         }
       }
 
@@ -201,19 +209,18 @@
         return true;
       }
 
-      // direct: 1(90) / -1(-90) / 2(180)
+      // direct: 1(90) / 2(180) / 3(-90)
       rotate(next, direct)
       {
-        next.position[0] = this.position[0];
-        next.position[1] = this.position[1];
+        next.position = [this.position[0], this.position[1]];
         next.type = this.type;
-        next.direction = (this.direction + direct + 4) % 4;
-        if (this.type == 1)
-        {
-        }
-        else if (this.type == 7)
-        {
-        }
+        next.direction = (this.direction + direct) % 4;
+        if (this.type == 1 || this.type == 7)
+          for (var index = 0; index < direct; index += 1)
+          {
+            next.position[0] += Setting.align[this.direction + index][0];
+            next.position[1] += Setting.align[this.direction + index][1];
+          }
       }
 
       // check where to place the piece
@@ -221,13 +228,10 @@
       {
       }
     }
-    now = new Piece([4, 0], 7, 1);
-    next = new Piece();
+    now = new Piece([10, 5], 6, 0);
 
     function init()
     {
-      console.log(now.check());
-      now.draw();
     }
   </script>
 </body>

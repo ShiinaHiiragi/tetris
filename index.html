@@ -238,7 +238,7 @@
       // draw the piece on the panel and the array
       // clear: true: print, false: clear
       // heap: true: solid, false: not solid
-      draw(clear, heap)
+      draw(clear, heap, transparent)
       {
         var high = true;
         var center = [this.position[0] - 4, this.position[1]];
@@ -246,6 +246,8 @@
         if (center[0] >= 0)
         {
           Cite.cells[center[0]][center[1]].style.backgroundColor = Setting.color[clear ? this.type : 0];
+          if (transparent) Cite.cells[center[0]][center[1]].style.opacity = "0.5";
+          else Cite.cells[center[0]][center[1]].style.opacity = "1";
           high = false;
         }
         Panel.cells[center[0] + 4][center[1]] = clear ? (heap ? 2 : 1) : 0;
@@ -256,6 +258,8 @@
           {
             Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
               Setting.color[clear ? this.type : 0];
+            if (transparent) Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.opacity = "0.5";
+            else Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.opacity = "1";
             high = false;
           }
         }
@@ -326,9 +330,33 @@
 
     function updatePieceNow()
     {
-      Pieces.now.draw(false, false);
-      Pieces.next.draw(true, false);
+      Pieces.now.draw(false, false, false);
+      Pieces.next.draw(true, false, false);
       Pieces.now.copy(Pieces.next);
+    }
+
+    // mode: true: next, clear, false: Pieces.now, not clear
+    function updatePreviewNow(mode)
+    {
+      var bias = 1;
+      if (mode)
+      {
+        while (Pieces.next.shift(Pieces.previewNext, [bias, 0])) bias += 1;
+        Pieces.next.shift(Pieces.previewNext, [bias - 1, 0]);
+        Pieces.preview.draw(false, false, false);
+        Pieces.now.draw(false, false, false);
+        Pieces.previewNext.draw(true, false, true);
+        Pieces.next.draw(true, false, false);
+        Pieces.preview.copy(Pieces.previewNext);
+        Pieces.now.copy(Pieces.next);
+      }
+      else
+      {
+        while (Pieces.now.shift(Pieces.preview, [bias, 0])) bias += 1;
+        Pieces.now.shift(Pieces.preview, [bias - 1, 0]);
+        Pieces.preview.draw(true, false, true);
+        Pieces.now.draw(true, false, false);
+      }
     }
 
     function chooseTimeInterval()
@@ -369,7 +397,7 @@
         else second = 2;
         var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
                      event.keyCode == Setting.keyDownCode.rightQuarter);
-        if (Pieces.now.rotate(Pieces.next, second, third)) updatePieceNow()
+        if (Pieces.now.rotate(Pieces.next, second, third)) updatePreviewNow(true);
       }
       else if (event.keyCode == Setting.keyDownCode.left ||
                event.keyCode == Setting.keyDownCode.right)
@@ -381,7 +409,7 @@
           chooseTimeInterval();
         }
         if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
-          updatePieceNow();
+          updatePreviewNow(true);
       }
       else if (event.keyCode == Setting.keyDownCode.hold ||
                event.keyCode == Setting.keyDownCode.softDrop ||
@@ -421,10 +449,10 @@
         updatePieceNow();
         chooseTimeInterval();
       }
-      else if (Pieces.now.draw(true, true)) gameOver();
+      else if (Pieces.now.draw(true, true, false)) gameOver();
       else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
       {
-        Pieces.now.draw(true, false);
+        updatePreviewNow(false);
         chooseTimeInterval();
         if (System.shufflePointer == 7) System.shuffleRefresh();
       }
@@ -438,7 +466,7 @@
 
       System.shuffleInit();
       Pieces.now.init(System.shuffle[System.shufflePointer]);
-      Pieces.now.draw(true, false);
+      updatePreviewNow(false);
       chooseTimeInterval();
       document.addEventListener('keydown', keyboardEvent);
     }

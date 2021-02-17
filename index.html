@@ -88,7 +88,7 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
-      fallTime: 200,
+      fallTime: 400,
       lockTime: 500
     }
     // process raw setting in the file
@@ -316,13 +316,24 @@
         return false;
       }
     }
-    var Pieces = {now: new Piece(), next: new Piece(), try: new Piece(), preview: new Piece()}
+    var Pieces =
+    {
+      now: new Piece(), next: new Piece(), try: new Piece(),
+      preview: new Piece(), previewNext: new Piece()
+    }
 
-    function updateNow()
+    function updatePieceNow()
     {
       Pieces.now.draw(false, false);
       Pieces.next.draw(true, false);
       Pieces.now.copy(Pieces.next);
+    }
+
+    function chooseTimeInterval()
+    {
+      if (Pieces.now.shift(Pieces.next, [1, 0]))
+        System.falldownClock = window.setTimeout(falldownDelay, Setting.fallTime);
+      else System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
     }
 
     function gameOver()
@@ -335,17 +346,6 @@
       alert("Game Over.");
     }
 
-    function naturalFalldown()
-    {
-      if (Pieces.now.shift(Pieces.next, [1, 0])) updateNow()
-      else
-      {
-        console.log("lockdownTime");
-        System.falldownClock = window.clearInterval(System.falldownClock);
-        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
-      }
-    }
-
     function keyboardEvent(event)
     {
       if (event.keyCode == Setting.keyDownCode.leftQuarter ||
@@ -356,10 +356,10 @@
         // used for judging T-Spin
         System.lastSpin = true;
         // reset lockdownClock
-        if (System.falldownClock == undefined)
+        if (System.falldownClock == null)
         {
           System.lockdownClock = window.clearTimeout(System.lockdownClock);
-          System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+          chooseTimeInterval();
         }
         var second;
         if (event.keyCode == Setting.keyDownCode.rightQuarter) second = 1;
@@ -367,48 +367,57 @@
         else second = 2;
         var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
                      event.keyCode == Setting.keyDownCode.rightQuarter);
-        if (Pieces.now.rotate(Pieces.next, second, third)) updateNow()
+        if (Pieces.now.rotate(Pieces.next, second, third)) updatePieceNow()
       }
       else if (event.keyCode == Setting.keyDownCode.left ||
                event.keyCode == Setting.keyDownCode.right)
       {
         System.lastSpin = false;
-        if (System.falldownClock == undefined)
+        if (System.falldownClock == null)
         {
           System.lockdownClock = window.clearTimeout(System.lockdownClock);
-          System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+          chooseTimeInterval();
         }
         if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
-          updateNow();
+          updatePieceNow();
       }
       else if (event.keyCode == Setting.keyDownCode.hold ||
                event.keyCode == Setting.keyDownCode.softDrop ||
                event.keyCode == Setting.keyDownCode.hardDrop)
       {
         System.lastSpin = false;
-        if (event.keyCode == Setting.keyDownCode.softDrop)
-        {
-          if (Pieces.now.shift(Pieces.next, [1, 0]))
-            updateNow();
-        }
+        if (event.keyCode == Setting.keyDownCode.softDrop && Pieces.now.shift(Pieces.next, [1, 0]))
+            updatePieceNow();  
         else if (event.keyCode == Setting.keyDownCode.hardDrop)
         {
           Pieces.next.copy(Pieces.now);
           while (Pieces.next.shift(Pieces.try, [1, 0]))
             Pieces.next.copy(Pieces.try);
-          updateNow();
+          updatePieceNow();
           System.falldownClock = window.clearInterval(System.falldownClock);
           lockdownDelay();
         }
       }
     }
 
-    function lockdownDelay()
+    function falldownDelay()
     {
+      System.falldownClock = null;
       if (Pieces.now.shift(Pieces.next, [1, 0]))
       {
-        updateNow();
-        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+        updatePieceNow();
+        chooseTimeInterval();
+      }
+      else System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+    }
+
+    function lockdownDelay()
+    {
+      System.lockdownClock = null;
+      if (Pieces.now.shift(Pieces.next, [1, 0]))
+      {
+        updatePieceNow();
+        chooseTimeInterval();
       }
       else if (Pieces.now.draw(true, true)) gameOver();
       else
@@ -418,7 +427,7 @@
         if (Pieces.now.check())
         {
           Pieces.now.draw(true, false);
-          System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
+          chooseTimeInterval();
         }
         else gameOver();
       }
@@ -426,12 +435,14 @@
 
     function initialize()
     {
+      // TODO: delete it later
       document.getElementById("little-button").style.visibility = "hidden";
+
       System.shuffleInit();
       Pieces.now.init(System.shuffle[System.shufflePointer]);
       Pieces.now.draw(true, false);
+      chooseTimeInterval();
       document.addEventListener('keydown', keyboardEvent);
-      System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
     }
   </script>
 </body>

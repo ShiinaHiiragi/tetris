@@ -88,7 +88,7 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
-      fallTime: 800,
+      fallTime: 200,
       lockTime: 500
     }
     // process raw setting in the file
@@ -325,17 +325,6 @@
       Pieces.now.copy(Pieces.next);
     }
 
-    function naturalFalldown()
-    {
-      if (Pieces.now.shift(Pieces.next, [1, 0])) updateNow()
-      else
-      {
-        console.log("lockdownTime");
-        System.falldownClock = window.clearInterval(System.falldownClock);
-        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
-      }
-    }
-
     function gameOver()
     {
       if (System.falldownClock != undefined)
@@ -346,24 +335,14 @@
       alert("Game Over.");
     }
 
-    function lockdownDelay()
+    function naturalFalldown()
     {
-      if (Pieces.now.shift(Pieces.next, [1, 0]))
-      {
-        updateNow();
-        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
-      }
-      else if (Pieces.now.draw(true, true)) gameOver();
+      if (Pieces.now.shift(Pieces.next, [1, 0])) updateNow()
       else
       {
-        Pieces.now.init(System.shuffle[++System.shufflePointer]);
-        if (System.shufflePointer == 7) System.shuffleRefresh();
-        if (Pieces.now.check())
-        {
-          Pieces.now.draw(true, false);
-          System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
-        }
-        else gameOver();
+        console.log("lockdownTime");
+        System.falldownClock = window.clearInterval(System.falldownClock);
+        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
       }
     }
 
@@ -421,6 +400,27 @@
           System.falldownClock = window.clearInterval(System.falldownClock);
           lockdownDelay();
         }
+      }
+    }
+
+    function lockdownDelay()
+    {
+      if (Pieces.now.shift(Pieces.next, [1, 0]))
+      {
+        updateNow();
+        System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
+      }
+      else if (Pieces.now.draw(true, true)) gameOver();
+      else
+      {
+        Pieces.now.init(System.shuffle[++System.shufflePointer]);
+        if (System.shufflePointer == 7) System.shuffleRefresh();
+        if (Pieces.now.check())
+        {
+          Pieces.now.draw(true, false);
+          System.falldownClock = window.setInterval(naturalFalldown, Setting.fallTime);
+        }
+        else gameOver();
       }
     }
 

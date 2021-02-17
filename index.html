@@ -155,6 +155,7 @@
       align: [[1, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [0, -1]],
       positionInit: [null, [2, 5], [3, 4], [3, 4], [3, 4], [3, 4], [3, 4], [3, 5]],
       cellEachLine: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      accord: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       lastSpin: false,
       falldownClock: null,
       lockdownClock: null,
@@ -197,7 +198,7 @@
         Cite.cells[i][j].className = "cell";
         Cite.cells[i][j].id = "cell-" + i.toString() + "-" + j.toString();
         // TODO: delete this arrtibute before realeasing
-        Cite.cells[i][j].setAttribute("onclick", "setColor(this)")
+        // Cite.cells[i][j].setAttribute("onclick", "setColor(this)")
         Cite.field.append(Cite.cells[i][j]);
       }
 
@@ -250,10 +251,13 @@
           else Cite.cells[center[0]][center[1]].style.opacity = "1";
           high = false;
         }
-        Panel.cells[center[0] + 4][center[1]] = clear ? (heap ? 2 : 1) : 0;
-        for (var index = 0; index < 3; index += 1) {
+        Panel.cells[center[0] + 4][center[1]] = (clear && heap ? this.type : 0);
+        if (heap) System.cellEachLine[center[0] + 4] += 1;
+        for (var index = 0; index < 3; index += 1)
+        {
           var bias = System.pieces[this.type][this.direction][index];
-          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = clear ? (heap ? 2 : 1) : 0;
+          Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] = (clear && heap ? this.type : 0);
+          if (heap) System.cellEachLine[center[0] + bias[0] + 4] += 1;
           if (center[0] + bias[0] >= 0)
           {
             Cite.cells[center[0] + bias[0]][center[1] + bias[1]].style.backgroundColor =
@@ -273,13 +277,13 @@
         var center = [this.position[0] - 4, this.position[1]];
         var bias = System.pieces[this.type][this.direction];
         if (center[0] < -4 || center[0] > 19 || center[1] < 0 || center[1] > 9) return false;
-        if (Panel.cells[center[0] + 4][center[1]] == 2) return false;
+        if (Panel.cells[center[0] + 4][center[1]]) return false;
         for (var index = 0; index < 3; index += 1)
         {
           var bias = System.pieces[this.type][this.direction][index];
           if (center[0] + bias[0] < -4 || center[0] + bias[0] > 19 ||
             center[1] + bias[1] < 0 || center[1] + bias[1] > 9) return false;
-          if (Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]] == 2) return false;
+          if (Panel.cells[center[0] + bias[0] + 4][center[1] + bias[1]]) return false;
         }
         return true;
       }
@@ -359,6 +363,30 @@
       }
     }
 
+    function updateLine()
+    {
+      for (var index = 23; index >= 0; index -= 1)
+        if (index != System.accord[index] && System.accord[index] >= 0)
+        {
+          for (var sub_index = 0; sub_index < 10; sub_index += 1)
+            Panel.cells[index][sub_index] = Panel.cells[System.accord[index]][sub_index];
+          System.cellEachLine[index] = System.cellEachLine[System.accord[index]];
+          if (index >= 4)
+            for (var sub_index = 0; sub_index < 10; sub_index += 1)
+              Cite.cells[index - 4][sub_index].style.backgroundColor =
+              Setting.color[Panel.cells[System.accord[index]][sub_index]];
+        }
+        else if (index != System.accord[index])
+        {
+          for (var sub_index = 0; sub_index < 10; sub_index += 1)
+            Panel.cells[index][sub_index] = 0;
+          System.cellEachLine[index] = 0;
+          if (index >= 4)
+            for (var sub_index = 0; sub_index < 10; sub_index += 1)
+              Cite.cells[index - 4][sub_index].style.backgroundColor = Setting.color[0];
+        }
+    }
+
     function chooseTimeInterval()
     {
       if (Pieces.now.shift(Pieces.next, [1, 0]))
@@ -369,7 +397,7 @@
     function gameOver()
     {
       if (System.falldownClock != undefined)
-        System.falldownClock = window.clearInterval(System.falldownClock);
+        System.falldownClock = window.clearTimeout(System.falldownClock);
       if (System.lockdownClock != undefined)
         System.lockdownClock = window.clearTimeout(System.lockdownClock);
       // TODO: other behavior
@@ -386,7 +414,7 @@
         // used for judging T-Spin
         System.lastSpin = true;
         // reset lockdownClock
-        if (System.falldownClock == null)
+        if (System.falldownClock == undefined)
         {
           System.lockdownClock = window.clearTimeout(System.lockdownClock);
           chooseTimeInterval();
@@ -403,7 +431,7 @@
                event.keyCode == Setting.keyDownCode.right)
       {
         System.lastSpin = false;
-        if (System.falldownClock == null)
+        if (System.falldownClock == undefined)
         {
           System.lockdownClock = window.clearTimeout(System.lockdownClock);
           chooseTimeInterval();
@@ -420,9 +448,7 @@
             updatePieceNow();  
         else if (event.keyCode == Setting.keyDownCode.hardDrop)
         {
-          Pieces.next.copy(Pieces.now);
-          while (Pieces.next.shift(Pieces.try, [1, 0]))
-            Pieces.next.copy(Pieces.try);
+          Pieces.next.copy(Pieces.preview);
           updatePieceNow();
           System.falldownClock = window.clearInterval(System.falldownClock);
           lockdownDelay();
@@ -432,7 +458,7 @@
 
     function falldownDelay()
     {
-      System.falldownClock = null;
+      System.falldownClock = window.clearTimeout(System.falldownClock);
       if (Pieces.now.shift(Pieces.next, [1, 0]))
       {
         updatePieceNow();
@@ -443,20 +469,39 @@
 
     function lockdownDelay()
     {
-      System.lockdownClock = null;
+      System.lockdownClock = window.clearTimeout(System.lockdownClock);
       if (Pieces.now.shift(Pieces.next, [1, 0]))
       {
         updatePieceNow();
         chooseTimeInterval();
       }
-      else if (Pieces.now.draw(true, true, false)) gameOver();
+      else if (Pieces.now.draw(true, true, false))
+      {
+        gameOver();
+        console.log("The new one coincide with the existed.");
+      }
       else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
       {
+        // detect full line
+        var ptr = 23;
+        var fullLine = new Array();
+        for (var index = 0; index < 24; index += 1)
+          if (System.cellEachLine[index] == 10) fullLine.push(index);
+        for (var index = 23; index >= 0; index -= 1, ptr -= 1)
+        {
+          while (fullLine.includes(ptr)) ptr -= 1;
+          System.accord[index] = ptr;
+        }
+        updateLine();
         updatePreviewNow(false);
         chooseTimeInterval();
         if (System.shufflePointer == 7) System.shuffleRefresh();
       }
-      else gameOver();
+      else
+      {
+        gameOver();
+        console.log("The piece is higher than layer twenty.");
+      }
     }
 
     function initialize()

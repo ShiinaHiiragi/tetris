@@ -154,12 +154,14 @@
       ],
       align: [[1, 0], [0, -1], [-1, 0], [0, 1], [1, 0], [0, -1]],
       positionInit: [null, [2, 5], [3, 4], [3, 4], [3, 4], [3, 4], [3, 4], [3, 5]],
+      cellEachLine: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       lastSpin: false,
       falldownClock: null,
       lockdownClock: null,
       firstBag: null,
       secondBag: null,
       shuffle: null,
+      shufflePointer: 0,
       shuffleInit: function ()
       {
         this.shufflePointer = 0;
@@ -174,8 +176,7 @@
         this.secondBag = null;
         this.secondBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
         this.shuffle = this.firstBag.concat(this.secondBag);
-      },
-      shufflePointer: 0
+      }
     }
 
     // Cite: the element in the HTML DOM
@@ -224,6 +225,7 @@
         this.type = index;
         this.direction = 0;
         this.position = [System.positionInit[index][0], System.positionInit[index][1]];
+        return this.check();
       }
 
       copy(right)
@@ -420,17 +422,13 @@
         chooseTimeInterval();
       }
       else if (Pieces.now.draw(true, true)) gameOver();
-      else
+      else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
       {
-        Pieces.now.init(System.shuffle[++System.shufflePointer]);
+        Pieces.now.draw(true, false);
+        chooseTimeInterval();
         if (System.shufflePointer == 7) System.shuffleRefresh();
-        if (Pieces.now.check())
-        {
-          Pieces.now.draw(true, false);
-          chooseTimeInterval();
-        }
-        else gameOver();
       }
+      else gameOver();
     }
 
     function initialize()

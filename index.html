@@ -14,23 +14,24 @@
   <!-- Customized Resources -->
   <style>
     .panel {
-      height: 90vh;
+      position: absolute;
+      height: 80vh;
       width: 40vw;
       min-width: 80vh;
-      padding-top: 10vh;
-      margin-left: 30vw;
+      top: 10vh;
+      left: 30vw;
     }
 
     .side {
       float: left;
-      height: 80vh;
-      min-width: 20vh;
+      height: 100%;
       width: calc((40vw - 40vh) / 2);
+      min-width: 20vh;
     }
 
     .field {
       float: left;
-      height: 80vh;
+      height: 100%;
       width: 40vh;
       border: 1px solid rgb(225, 225, 225);
     }
@@ -58,47 +59,49 @@
     }
 
     .hold-piece {
-      margin: 0 auto;
-      width: 100%;
+      position: absolute;
+      width: calc((100% - 40vh) / 2);
       height: 8vh;
     }
 
     .hold-piece-other {
-      margin: auto;
+      position: absolute;
       width: 12vh;
       height: 8vh;
+      left: calc((100% - 12vh) / 2);
+      z-index: 1;
     }
 
     .hold-piece-o {
-      position: relative;
-      top: -8vh;
+      position: absolute;
       width: 8vh;
-      height:8vh;
-      margin: -8vh auto;
+      height: 8vh;
+      left: calc((100% - 8vh) / 2);
+      z-index: 2;
     }
 
     .hold-piece-i {
-      position: relative;
-      top: -14vh;
+      position: absolute;
       width: 16vh;
       height: 4vh;
-      margin: 2vh auto;
+      top: 2vh;
+      left: calc((100% - 16vh) / 2);
+      z-index: 3;
     }
 
     .hold-cell {
       height: 4vh;
       width: 4vh;
       float: left;
-      /*
-      border: 1px solid rgb(240, 240, 240);
-      background-color: rgb(225, 225, 225);
-      */
     }
 
     .hold-cell-invisible {
       height: 4vh;
       width: 4vh;
       float: left;
+    }
+    
+    .next {
     }
   </style>
 </head>
@@ -111,19 +114,18 @@
         <div class="hold-piece" id="left">
           <div class="hold-piece-other" id="hold-piece-other"></div>
           <div class="hold-piece-o" id="hold-piece-o"></div>
-          <div class="hold-piece-i" id="hold-piece-i">
-            <div class="hold-cell-invisible"></div>
-          </div>
+          <div class="hold-piece-i" id="hold-piece-i"></div>
         </div>
       </div>
     </div>
     <div class="field" id="field"></div>
     <div class="side" id="right-side">
       <!-- TODO: Next Pieces Here -->
-      <div class="ui container">
-        <button class="ui button" id="little-button" style="margin-left: 20px" onclick="initialize()"> Start </button>
-      </div>
+
     </div>
+  </div>
+  <div class="ui container">
+    <button class="ui button" id="little-button" onclick="initialize()"> Start </button>
   </div>
   <script>
     // TODO: delete these variables after releasing

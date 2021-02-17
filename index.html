@@ -55,6 +55,8 @@
       height: 8vh;
       padding-top: 2vh;
       font-size: 3.6vh;
+      text-align: center;
+      user-select: none;
       color: black;
     }
 
@@ -102,6 +104,20 @@
     }
     
     .next {
+      position: absolute;
+      height: 8vh;
+      width: calc((100% - 40vh) / 2);
+    }
+
+    .next-text {
+      position: absolute;
+      height: 8vh;
+      width: calc((100% - 40vh) / 2);
+      padding-top: 2vh;
+      font-size: 3.6vh;
+      text-align: center;
+      user-select: none;
+      color: black;
     }
   </style>
 </head>
@@ -110,18 +126,14 @@
   <div class="panel">
     <div class="side" id="left-side">
       <div class="hold">
-        <div class="hold-text"> <p align="center">Hold</p> </div>
-        <div class="hold-piece" id="left">
-          <div class="hold-piece-other" id="hold-piece-other"></div>
-          <div class="hold-piece-o" id="hold-piece-o"></div>
-          <div class="hold-piece-i" id="hold-piece-i"></div>
+        <div class="hold-text"><p>Hold</p></div>
+        <div class="hold-piece" id="show-0">
         </div>
       </div>
     </div>
     <div class="field" id="field"></div>
     <div class="side" id="right-side">
-      <!-- TODO: Next Pieces Here -->
-
+      <div class="next-text"><p>Next</p></div>
     </div>
   </div>
   <div class="ui container">
@@ -234,6 +246,7 @@
       cellEachLine: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       accord: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       sideCount: [6, 4, 4],
+      holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
       allowChange: true,
       lastSpin: false,
       falldownClock: null,
@@ -262,16 +275,16 @@
     // Cite: the element in the HTML DOM
     var Cite =
     {
-      left: document.getElementById("left"),
+      rightSide: document.getElementById("right-side"),
       field: document.getElementById("field"),
       // cells: a two-dimension array citing the 10 × 20 grid
       cells: new Array(20),
-      sides: new Array(6)
+      sides: new Array(7)
     }
     // process the raw element in the DOM
     for (var index = 0; index < 20; index += 1)
       Cite.cells[index] = new Array(10).fill(null);
-    for (var index = 0; index < 6; index += 1)
+    for (var index = 0; index < 7; index += 1)
       Cite.sides[index] = new Array(14).fill(null);
     for (var index = 0; index < 20; index += 1)
       for (var subIndex = 0; subIndex < 10; subIndex += 1)
@@ -283,16 +296,32 @@
         /* Cite.cells[index][subIndex].setAttribute("onclick", "setColor(this)") */
         Cite.field.append(Cite.cells[index][subIndex]);
       }
-    var tempPtr = 0;
-    for (var index = 0; index < 3; index += 1)
-      for (var subIndex = 0; subIndex < System.sideCount[index]; subIndex += 1)
+    Cite.rightSide.style.border = "1.6px solid rgb(225, 225, 225)";
+    for (var index = 1; index <= 6; index += 1)
+    {
+      var newDiv = document.createElement("div");
+      newDiv.className = "next";
+      newDiv.id = "show-" + index.toString();
+      newDiv.style.top = (12 * (index - 1) + 8).toString() + "vh";
+      Cite.rightSide.append(newDiv);
+    }
+    for (var parentIndex = 0; parentIndex < 7; parentIndex += 1)
+    {
+      var tempPointer = 0;
+      var showIndex = document.getElementById("show-" + parentIndex.toString());
+      for (var index = 0; index < 3; index += 1)
       {
-        Cite.sides[0][tempPtr] = document.createElement("div");
-        Cite.sides[0][tempPtr].className = "hold-cell";
-        Cite.sides[0][tempPtr].id = "side-0-" + tempPtr.toString();
-        Cite.left.children[index].append(Cite.sides[0][tempPtr]);
-        tempPtr += 1;
+        var showTag = document.createElement("div");
+        showTag.className = System.holdPiece[index];
+        for (var subIndex = 0; subIndex < System.sideCount[index]; subIndex += 1)
+        {
+          Cite.sides[parentIndex][tempPointer] = document.createElement("div");
+          Cite.sides[parentIndex][tempPointer].className = "hold-cell";
+          showTag.append(Cite.sides[parentIndex][tempPointer++]);
+        }
+        showIndex.append(showTag);
       }
+    }
 
     // Panel: The cell and the data of Tetris
     var Panel = {cells: new Array(24), score: 0, line: 0, hold: 0}
@@ -589,6 +618,11 @@
               Pieces.preview.draw(false, false, false);
               updatePreviewNow(false);
               chooseTimeInterval();
+              for (var index = 1; index <= 6; index += 1)
+              {
+                drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
+                drawSide(index, System.shuffle[System.shufflePointer + index], true);
+              }
               if (System.shufflePointer == 7) System.shuffleRefresh();
             }
           }
@@ -632,6 +666,11 @@
         updatePreviewNow(false);
         System.allowChange = true;
         chooseTimeInterval();
+        for (var index = 1; index <= 6; index += 1)
+        {
+          drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
+          drawSide(index, System.shuffle[System.shufflePointer + index], true);
+        }
         if (System.shufflePointer == 7) System.shuffleRefresh();
       }
       else gameOver();
@@ -645,6 +684,8 @@
       System.shuffleInit();
       Pieces.now.init(System.shuffle[System.shufflePointer]);
       updatePreviewNow(false);
+      for (var index = 1; index <= 6; index += 1)
+        drawSide(index, System.shuffle[System.shufflePointer + index], true);
       chooseTimeInterval();
       document.addEventListener('keydown', keyboardEvent);
     }

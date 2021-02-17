@@ -107,7 +107,7 @@
   <div class="panel">
     <div class="side" id="left-side">
       <div class="hold">
-        <div class="hold-text"> <p align="center">Now</p> </div>
+        <div class="hold-text"> <p align="center">Hold</p> </div>
         <div class="hold-piece" id="left">
           <div class="hold-piece-other" id="hold-piece-other"></div>
           <div class="hold-piece-o" id="hold-piece-o"></div>
@@ -127,17 +127,18 @@
   </div>
   <script>
     // TODO: delete these variables after releasing
-    // var cellsColor = new Array(20);
-    // for (var i = 0; i < 20; i += 1)
-    //   cellsColor[i] = new Array(10).fill(0);
-    // function setColor(element)
-    // {
-    //   var str = element.id.split("-");
-    //   var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
-    //   element.style.backgroundColor = Setting.color[index % 8];
-    //   // used for manipulating transparency
-    //   // element.style.opacity = "0.5";
-    // }
+    /*
+    var cellsColor = new Array(20);
+    for (var i = 0; i < 20; i += 1)
+      cellsColor[i] = new Array(10).fill(0);
+    function setColor(element)
+    {
+      var str = element.id.split("-");
+      var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
+      element.style.backgroundColor = Setting.color[index % 8];
+      Panel.cells[Number(str[1]) + 4][Number(str[2])] = index % 8;
+    }
+    */
 
     // TODO: initializing variables from settings.json
     var Setting =
@@ -231,6 +232,7 @@
       cellEachLine: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       accord: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       sideCount: [6, 4, 4],
+      allowChange: true,
       lastSpin: false,
       falldownClock: null,
       lockdownClock: null,
@@ -276,7 +278,7 @@
         Cite.cells[index][subIndex].className = "cell";
         Cite.cells[index][subIndex].id = "cell-" + index.toString() + "-" + subIndex.toString();
         // TODO: delete this arrtibute before realeasing
-        // Cite.cells[i][j].setAttribute("onclick", "setColor(this)")
+        /* Cite.cells[index][subIndex].setAttribute("onclick", "setColor(this)") */
         Cite.field.append(Cite.cells[index][subIndex]);
       }
     var tempPtr = 0;
@@ -291,7 +293,7 @@
       }
 
     // Panel: The cell and the data of Tetris
-    var Panel = {cells: new Array(24), score: 0, line: 0}
+    var Panel = {cells: new Array(24), score: 0, line: 0, hold: 0}
     // process raw panel data
     for (var index = 0; index < 24; index += 1)
       Panel.cells[index] = new Array(10).fill(0);
@@ -554,6 +556,41 @@
           System.falldownClock = window.clearInterval(System.falldownClock);
           lockdownDelay();
         }
+        else if (event.keyCode == Setting.keyDownCode.hold && System.allowChange)
+        {
+          System.allowChange = false;
+          Pieces.now.draw(false, false, false);
+          if (System.falldownClock != undefined)
+              System.falldownClock = window.clearTimeout(System.falldownClock);
+          if (System.lockdownClock != undefined)
+            System.lockdownClock = window.clearTimeout(System.lockdownClock);
+          if (Panel.hold)
+          {
+            // Piece.now.type  Panel.hold
+            var tempNow = Pieces.now.type;
+            drawSide(0, Panel.hold, false);
+            drawSide(0, Pieces.now.type, true);
+            if (Pieces.now.init(Panel.hold))
+            {
+              Pieces.preview.draw(false, false, false);
+              updatePreviewNow(false);
+              chooseTimeInterval();
+            }
+            Panel.hold = tempNow;
+          }
+          else
+          {
+            drawSide(0, Pieces.now.type, true);
+            Panel.hold = Pieces.now.type;
+            if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
+            {
+              Pieces.preview.draw(false, false, false);
+              updatePreviewNow(false);
+              chooseTimeInterval();
+              if (System.shufflePointer == 7) System.shuffleRefresh();
+            }
+          }
+        }
       }
     }
 
@@ -576,11 +613,7 @@
         updatePieceNow();
         chooseTimeInterval();
       }
-      else if (Pieces.now.draw(true, true, false))
-      {
-        gameOver();
-        console.log("The new one coincide with the existed.");
-      }
+      else if (Pieces.now.draw(true, true, false)) gameOver();
       else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
       {
         // detect full line
@@ -595,14 +628,11 @@
         }
         updateLine();
         updatePreviewNow(false);
+        System.allowChange = true;
         chooseTimeInterval();
         if (System.shufflePointer == 7) System.shuffleRefresh();
       }
-      else
-      {
-        gameOver();
-        console.log("The piece is higher than layer twenty.");
-      }
+      else gameOver();
     }
 
     function initialize()

@@ -200,7 +200,7 @@
         hardDrop: 38, softDrop: 40
       },
       debugMode: true,
-      bgm: 0,
+      bgm: 3,
       fallTime: 500,
       lockTime: 500
     }
@@ -667,7 +667,14 @@
         {
           System.lastSpin = false;
           if (event.keyCode == Setting.keyDownCode.softDrop && Pieces.now.shift(Pieces.next, [1, 0]))
-              Game.updatePieceNow();  
+          {
+            Game.updatePieceNow();
+            if (System.falldownClock != undefined)
+            {
+              System.falldownClock = window.clearTimeout(System.falldownClock);
+              Game.chooseTimeInterval();
+            }
+          }
           else if (event.keyCode == Setting.keyDownCode.hardDrop)
           {
             Pieces.next.copy(Pieces.preview);

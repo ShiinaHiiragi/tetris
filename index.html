@@ -171,6 +171,16 @@
       text-align: center;
       color: black;
     }
+
+    #start-button {
+      position: absolute;
+      top: 90vh;
+      left: 30vw;
+      border-radius: 0;
+      width: 40vw;
+      min-width: 80vh;
+      max-height: 10vh;
+    }
   </style>
 </head>
 
@@ -198,7 +208,7 @@
     </div>
   </div>
   <div class="ui container">
-    <button class="ui button" id="little-button" onclick="initialize()"> Start </button>
+    <button class="ui button" id="start-button" onclick="initialize()"> Start </button>
   </div>
   <script>
     // TODO: initializing variables from settings.json
@@ -279,6 +289,7 @@
       seList: ["normal.mp3", "put.mp3", "hold.mp3", "erase.mp3"],
       allowChange: true,
       lastSpin: false,
+      gameStart: false,
       bgm: null,
       se: [null, null, null, null],
       falldownClock: null,
@@ -374,17 +385,25 @@
       },
       setColor: function(element)
       {
-        Pieces.preview.draw(false, false, false);
-        var bias = 1, str = element.id.split("-");
-        var xIndex = Number(str[1]) + 4, yIndex = Number(str[2]);
-        var colorIndex = (Panel.cells[xIndex][yIndex] = (Panel.cells[xIndex][yIndex] + 1) % 8);
-        if (colorIndex == 1) System.cellEachLine[xIndex] += 1;
-        else if (colorIndex == 0) System.cellEachLine[xIndex] -= 1;
-        element.style.backgroundColor = Setting.color[colorIndex];
-        while (Pieces.next.shift(Pieces.previewNext, [bias, 0])) bias += 1;
-        Pieces.next.shift(Pieces.previewNext, [bias - 1, 0]);
-        Pieces.previewNext.draw(true, false, true);
-        Pieces.preview.copy(Pieces.previewNext);
+        if (System.lockdownClock == undefined)
+        {
+          if (System.gameStart) Pieces.preview.draw(false, false, false);
+          var bias = 1, str = element.id.split("-");
+          var xIndex = Number(str[1]) + 4, yIndex = Number(str[2]);
+          var colorIndex = (Panel.cells[xIndex][yIndex] = (Panel.cells[xIndex][yIndex] + 1) % 8);
+          if (colorIndex == 1) System.cellEachLine[xIndex] += 1;
+          else if (colorIndex == 0) System.cellEachLine[xIndex] -= 1;
+          element.style.backgroundColor = Setting.color[colorIndex];
+          if (System.gameStart)
+          {
+            while (Pieces.next.shift(Pieces.previewNext, [bias, 0])) bias += 1;
+            Pieces.next.shift(Pieces.previewNext, [bias - 1, 0]);
+            Pieces.previewNext.draw(true, false, true);
+            Pieces.preview.copy(Pieces.previewNext);
+            Pieces.now.draw(true, false, false);
+          }
+        }
+        else System.printInfo("Prevented: Locking Down");
       }
     }
 
@@ -822,8 +841,9 @@
     function initialize()
     {
       // TODO: delete it later
-      document.getElementById("little-button").style.visibility = "hidden";
+      document.getElementById("start-button").style.visibility = "hidden";
 
+      System.gameStart = true;
       System.loadBGM();
       System.shuffleInit();
       Pieces.now.init(System.shuffle[System.shufflePointer]);

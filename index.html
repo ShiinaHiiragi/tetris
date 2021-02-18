@@ -48,6 +48,7 @@
       width: 100%;
       height: 20vh;
       border: 1.6px solid rgb(225, 225, 225);
+      border-right-width: 0.6px;
     }
 
     .hold-text {
@@ -120,15 +121,36 @@
       color: black;
     }
 
-    .tetris {
-      position: absolute;
-      width: calc((100% - 40vh) / 2);
-      height: 8vh;
-      top: 36vh;
-      font-size: 4vh;
+    .combo {
+      width: 100%;
+      height: 18vh;
+      padding-top: 8vh;
+      font-size: 2.4vh;
       text-align: center;
       user-select: none;
+      color: rgb(231, 76, 60);
       z-index: 2;
+    }
+
+    .score {
+      width: 100%;
+      height: 60vh;
+      border: 1.6px solid rgb(225, 225, 225);
+      border-top: 0;
+      border-right-width: 0.6px;
+    }
+
+    .score-bar {
+      width: 100%;
+      height: 12vh;
+      text-align: center;
+      user-select: none;
+      padding-top: 4vh;
+      font-size: 3vh;
+    }
+
+    .score-bar>p {
+      margin-bottom: 0;
     }
   </style>
 </head>
@@ -140,8 +162,18 @@
         <div class="hold-text"><p>Hold</p></div>
         <div class="hold-piece" id="show-0"></div>
       </div>
+      <div class="score">
+        <div class="combo"><p id="combo"></p></div>
+        <div class="score-bar"><p>Score</p><p id="score">0</p></div>
+        <div class="score-bar"><p>Line</p><p id="line">0</p></div>
+        <div class="score-bar"><p>Time</p>
+          <span id="hour">00</span><span>:</span><span id="minute">00</span><span>:</span><span id="second">00</span>
+        </div>
+      </div>
     </div>
-    <div class="field" id="field"></div>
+    <div class="field" id="field">
+      <p id="tinfo" hidden>B2B T-Spin Double</p>
+    </div>
     <div class="side" id="right-side">
       <div class="next-text"><p>Next</p></div>
     </div>
@@ -151,18 +183,16 @@
   </div>
   <script>
     // TODO: delete these variables after releasing
-    /*
-    var cellsColor = new Array(20);
-    for (var i = 0; i < 20; i += 1)
-      cellsColor[i] = new Array(10).fill(0);
     function setColor(element)
     {
       var str = element.id.split("-");
-      var index = (cellsColor[Number(str[1])][Number(str[2])] += 1);
-      element.style.backgroundColor = Setting.color[index % 8];
-      Panel.cells[Number(str[1]) + 4][Number(str[2])] = index % 8;
+      var xIndex = Number(str[1]) + 4, yIndex = Number(str[2]);
+      Panel.cells[xIndex][yIndex] += 1;
+      var colorIndex = (Panel.cells[xIndex][yIndex] %= 8);
+      if (colorIndex == 1) System.cellEachLine[xIndex] += 1;
+      else if (colorIndex == 0) System.cellEachLine[xIndex] -= 1;
+      element.style.backgroundColor = Setting.color[colorIndex];
     }
-    */
 
     // TODO: initializing variables from settings.json
     var Setting =
@@ -245,6 +275,8 @@
       se: [null, null, null, null],
       falldownClock: null,
       lockdownClock: null,
+      comboClock: null,
+      timerClock: null,
       firstBag: null,
       secondBag: null,
       shuffle: null,
@@ -284,12 +316,39 @@
       gameOver: function()
       {
         if (Setting.bgm > 0) this.bgm.pause();
+        System.timerClock = window.clearInterval(System.timerClock);
+        document.removeEventListener('keydown', Game.keyboardEvent);
         if (this.falldownClock != undefined)
           this.falldownClock = window.clearTimeout(this.falldownClock);
         if (this.lockdownClock != undefined)
           this.lockdownClock = window.clearTimeout(this.lockdownClock);
         // TODO: other behavior here
         alert("Game Over.");
+      },
+      printTimer: function(panel, cite)
+      {
+        if (panel < 10) cite.innerText = "0" + panel.toString();
+        else cite.innerText = panel.toString();
+      },
+      refreshTimer: function()
+      {
+        Panel.second += 1;
+        if (Panel.second == 60) Panel.second = 0, Panel.minute += 1;
+        if (Panel.minute == 60) Panel.minute = 0, Panel.hour += 1;
+        System.printTimer(Panel.second, Cite.second);
+        System.printTimer(Panel.minute, Cite.minute);
+        System.printTimer(Panel.hour, Cite.hour);
+      },
+      printCombo: function()
+      {
+        if (System.comboClock != undefined)
+          System.comboClock = window.clearTimeout(System.comboClock);
+        Cite.combo.innerText = "Combo\n" + Panel.combo.toString();
+        System.comboClock = window.setTimeout(function()
+        {
+          System.comboClock = window.clearTimeout(System.comboClock);
+          Cite.combo.innerText = "";
+        }, 1000);
       }
     }
 
@@ -298,6 +357,12 @@
     {
       rightSide: document.getElementById("right-side"),
       field: document.getElementById("field"),
+      hour: document.getElementById("hour"),
+      minute: document.getElementById("minute"),
+      second: document.getElementById("second"),
+      line: document.getElementById("line"),
+      tinfo: document.getElementById("tinfo"),
+      combo: document.getElementById("combo"),
       // cells: a two-dimension array citing the 10 × 20 grid
       cells: new Array(20),
       sides: new Array(7)
@@ -314,10 +379,11 @@
         Cite.cells[index][subIndex].className = "cell";
         Cite.cells[index][subIndex].id = "cell-" + index.toString() + "-" + subIndex.toString();
         // TODO: delete this arrtibute before realeasing
-        /* Cite.cells[index][subIndex].setAttribute("onclick", "setColor(this)") */
+        Cite.cells[index][subIndex].setAttribute("onclick", "setColor(this)");
         Cite.field.append(Cite.cells[index][subIndex]);
       }
     Cite.rightSide.style.border = "1.6px solid rgb(225, 225, 225)";
+    Cite.rightSide.style.borderLeftWidth = "0.6px";
     for (var index = 1; index <= 6; index += 1)
     {
       var newDiv = document.createElement("div");
@@ -345,7 +411,11 @@
     }
 
     // Panel: The cell and the data of Tetris
-    var Panel = {cells: new Array(24), score: 0, line: 0, hold: 0}
+    var Panel = {
+      cells: new Array(24), hold: 0, 
+      score: 0, line: 0, combo: 0,
+      hour: 0, minute: 0, second: 0
+    }
     // process raw panel data
     for (var index = 0; index < 24; index += 1)
       Panel.cells[index] = new Array(10).fill(0);
@@ -671,8 +741,19 @@
           var fullLine = new Array();
           for (var index = 0; index < 24; index += 1)
             if (System.cellEachLine[index] == 10) fullLine.push(index);
-          if (fullLine.length) System.se[3].cloneNode().play();
-          else System.se[1].cloneNode().play();
+          if (fullLine.length)
+          {
+            Panel.combo += 1;
+            if (Panel.combo > 1) System.printCombo();
+            System.se[3].cloneNode().play();
+            Panel.line += fullLine.length;
+            Cite.line.innerText = Panel.line.toString();
+          }
+          else
+          {
+            System.se[1].cloneNode().play();
+            Panel.combo = 0;
+          }
           for (var index = 23; index >= 0; index -= 1, ptr -= 1)
           {
             while (fullLine.includes(ptr)) ptr -= 1;
@@ -705,6 +786,7 @@
       for (var index = 1; index <= 6; index += 1)
         Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
       Game.chooseTimeInterval();
+      System.timerClock = window.setInterval(System.refreshTimer, 1000);
       document.addEventListener('keydown', Game.keyboardEvent);
     }
   </script>

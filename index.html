@@ -119,6 +119,17 @@
       user-select: none;
       color: black;
     }
+
+    .tetris {
+      position: absolute;
+      width: calc((100% - 40vh) / 2);
+      height: 8vh;
+      top: 36vh;
+      font-size: 4vh;
+      text-align: center;
+      user-select: none;
+      z-index: 2;
+    }
   </style>
 </head>
 
@@ -127,8 +138,7 @@
     <div class="side" id="left-side">
       <div class="hold">
         <div class="hold-text"><p>Hold</p></div>
-        <div class="hold-piece" id="show-0">
-        </div>
+        <div class="hold-piece" id="show-0"></div>
       </div>
     </div>
     <div class="field" id="field"></div>

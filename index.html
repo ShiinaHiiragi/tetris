@@ -259,10 +259,11 @@
       sideCount: [6, 4, 4],
       holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
       bgmList: ["classic.mp3", "t99.mp3", "t99_chip.mp3", "piano.mp3", "ppt.mp3"],
+      seList: ["normal.mp3", "put.mp3", "hold.mp3", "erase.mp3"],
       allowChange: true,
       lastSpin: false,
       bgm: null,
-      se: null,
+      se: [null, null, null, null],
       falldownClock: null,
       lockdownClock: null,
       firstBag: null,
@@ -291,6 +292,11 @@
         this.bgm.volume = 0.5;
         this.bgm.loop = true;
         this.bgm.play();
+        for (var index = 0; index < 4; index += 1)
+        {
+          this.se[index] = document.createElement("audio");
+          this.se[index].src = "src/se/" + this.seList[index];
+        }
       },
       gameOver: function()
       {
@@ -578,7 +584,11 @@
           else second = 2;
           var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
                       event.keyCode == Setting.keyDownCode.rightQuarter);
-          if (Pieces.now.rotate(Pieces.next, second, third)) Game.updatePreviewNow(true);
+          if (Pieces.now.rotate(Pieces.next, second, third))
+          {
+            Game.updatePreviewNow(true);
+            System.se[0].play();
+          }
         }
         else if (event.keyCode == Setting.keyDownCode.left ||
                 event.keyCode == Setting.keyDownCode.right)
@@ -590,7 +600,10 @@
             Game.chooseTimeInterval();
           }
           if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
+          {
             Game.updatePreviewNow(true);
+            System.se[0].play();
+          }
         }
         else if (event.keyCode == Setting.keyDownCode.hold ||
                 event.keyCode == Setting.keyDownCode.softDrop ||
@@ -645,6 +658,7 @@
                 if (System.shufflePointer == 7) System.shuffleRefresh();
               }
             }
+            System.se[2].play();
           }
         }
       },
@@ -674,6 +688,8 @@
           var fullLine = new Array();
           for (var index = 0; index < 24; index += 1)
             if (System.cellEachLine[index] == 10) fullLine.push(index);
+          if (fullLine.length) System.se[3].play();
+          else System.se[1].play();
           for (var index = 23; index >= 0; index -= 1, ptr -= 1)
           {
             while (fullLine.includes(ptr)) ptr -= 1;

@@ -181,7 +181,7 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
-      bgm: "t99.mp3",
+      bgm: 1,
       fallTime: 400,
       lockTime: 500
     }
@@ -258,6 +258,7 @@
       accord: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       sideCount: [6, 4, 4],
       holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
+      bgmList: ["classic.mp3", "t99.mp3", "t99_chip.mp3", "piano.mp3", "ppt.mp3"],
       allowChange: true,
       lastSpin: false,
       bgm: null,
@@ -286,7 +287,7 @@
       loadBGM: function()
       {
         this.bgm = document.createElement("audio");
-        this.bgm.src = "src/" + Setting.bgm;
+        this.bgm.src = "src/" + this.bgmList[Setting.bgm];
         this.bgm.volume = 0.5;
         this.bgm.loop = true;
         this.bgm.play();
@@ -483,6 +484,145 @@
       now: new Piece(), next: new Piece(), try: new Piece(),
       preview: new Piece(), previewNext: new Piece()
     }
+
+    var Game =
+    {
+      keyboardEvent: function(event)
+      {
+        if (event.keyCode == Setting.keyDownCode.leftQuarter ||
+            event.keyCode == Setting.keyDownCode.leftHalf ||
+            event.keyCode == Setting.keyDownCode.rightHalf ||
+            event.keyCode == Setting.keyDownCode.rightQuarter)
+        {
+          // used for judging T-Spin
+          System.lastSpin = true;
+          // reset lockdownClock
+          if (System.falldownClock == undefined)
+          {
+            System.lockdownClock = window.clearTimeout(System.lockdownClock);
+            chooseTimeInterval();
+          }
+          var second;
+          if (event.keyCode == Setting.keyDownCode.rightQuarter) second = 1;
+          else if (event.keyCode == Setting.keyDownCode.leftQuarter) second = 3;
+          else second = 2;
+          var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
+                      event.keyCode == Setting.keyDownCode.rightQuarter);
+          if (Pieces.now.rotate(Pieces.next, second, third)) updatePreviewNow(true);
+        }
+        else if (event.keyCode == Setting.keyDownCode.left ||
+                event.keyCode == Setting.keyDownCode.right)
+        {
+          System.lastSpin = false;
+          if (System.falldownClock == undefined)
+          {
+            System.lockdownClock = window.clearTimeout(System.lockdownClock);
+            chooseTimeInterval();
+          }
+          if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
+            updatePreviewNow(true);
+        }
+        else if (event.keyCode == Setting.keyDownCode.hold ||
+                event.keyCode == Setting.keyDownCode.softDrop ||
+                event.keyCode == Setting.keyDownCode.hardDrop)
+        {
+          System.lastSpin = false;
+          if (event.keyCode == Setting.keyDownCode.softDrop && Pieces.now.shift(Pieces.next, [1, 0]))
+              updatePieceNow();  
+          else if (event.keyCode == Setting.keyDownCode.hardDrop)
+          {
+            Pieces.next.copy(Pieces.preview);
+            updatePieceNow();
+            System.falldownClock = window.clearInterval(System.falldownClock);
+            Game.lockdownDelay();
+          }
+          else if (event.keyCode == Setting.keyDownCode.hold && System.allowChange)
+          {
+            System.allowChange = false;
+            Pieces.now.draw(false, false, false);
+            if (System.falldownClock != undefined)
+                System.falldownClock = window.clearTimeout(System.falldownClock);
+            if (System.lockdownClock != undefined)
+              System.lockdownClock = window.clearTimeout(System.lockdownClock);
+            if (Panel.hold)
+            {
+              // Piece.now.type  Panel.hold
+              var tempNow = Pieces.now.type;
+              drawSide(0, Panel.hold, false);
+              drawSide(0, Pieces.now.type, true);
+              if (Pieces.now.init(Panel.hold))
+              {
+                Pieces.preview.draw(false, false, false);
+                updatePreviewNow(false);
+                chooseTimeInterval();
+              }
+              Panel.hold = tempNow;
+            }
+            else
+            {
+              drawSide(0, Pieces.now.type, true);
+              Panel.hold = Pieces.now.type;
+              if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
+              {
+                Pieces.preview.draw(false, false, false);
+                updatePreviewNow(false);
+                chooseTimeInterval();
+                for (var index = 1; index <= 6; index += 1)
+                {
+                  drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
+                  drawSide(index, System.shuffle[System.shufflePointer + index], true);
+                }
+                if (System.shufflePointer == 7) System.shuffleRefresh();
+              }
+            }
+          }
+        }
+      },
+      falldownDelay: function()
+      {
+        System.falldownClock = window.clearTimeout(System.falldownClock);
+        if (Pieces.now.shift(Pieces.next, [1, 0]))
+        {
+          updatePieceNow();
+          chooseTimeInterval();
+        }
+        else System.lockdownClock = window.setTimeout(Game.lockdownDelay, Setting.lockTime);
+      },
+      lockdownDelay: function()
+      {
+        System.lockdownClock = window.clearTimeout(System.lockdownClock);
+        if (Pieces.now.shift(Pieces.next, [1, 0]))
+        {
+          updatePieceNow();
+          chooseTimeInterval();
+        }
+        else if (Pieces.now.draw(true, true, false)) System.gameOver();
+        else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
+        {
+          // detect full line
+          var ptr = 23;
+          var fullLine = new Array();
+          for (var index = 0; index < 24; index += 1)
+            if (System.cellEachLine[index] == 10) fullLine.push(index);
+          for (var index = 23; index >= 0; index -= 1, ptr -= 1)
+          {
+            while (fullLine.includes(ptr)) ptr -= 1;
+            System.accord[index] = ptr;
+          }
+          updateLine();
+          updatePreviewNow(false);
+          System.allowChange = true;
+          chooseTimeInterval();
+          for (var index = 1; index <= 6; index += 1)
+          {
+            drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
+            drawSide(index, System.shuffle[System.shufflePointer + index], true);
+          }
+          if (System.shufflePointer == 7) System.shuffleRefresh();
+        }
+        else System.gameOver();
+      }
+    };
     
     // clear: true: print, false: clear
     function drawSide(pos, type, clear)
@@ -555,146 +695,8 @@
     function chooseTimeInterval()
     {
       if (Pieces.now.shift(Pieces.next, [1, 0]))
-        System.falldownClock = window.setTimeout(falldownDelay, Setting.fallTime);
-      else System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
-    }
-
-    function keyboardEvent(event)
-    {
-      if (event.keyCode == Setting.keyDownCode.leftQuarter ||
-          event.keyCode == Setting.keyDownCode.leftHalf ||
-          event.keyCode == Setting.keyDownCode.rightHalf ||
-          event.keyCode == Setting.keyDownCode.rightQuarter)
-      {
-        // used for judging T-Spin
-        System.lastSpin = true;
-        // reset lockdownClock
-        if (System.falldownClock == undefined)
-        {
-          System.lockdownClock = window.clearTimeout(System.lockdownClock);
-          chooseTimeInterval();
-        }
-        var second;
-        if (event.keyCode == Setting.keyDownCode.rightQuarter) second = 1;
-        else if (event.keyCode == Setting.keyDownCode.leftQuarter) second = 3;
-        else second = 2;
-        var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
-                     event.keyCode == Setting.keyDownCode.rightQuarter);
-        if (Pieces.now.rotate(Pieces.next, second, third)) updatePreviewNow(true);
-      }
-      else if (event.keyCode == Setting.keyDownCode.left ||
-               event.keyCode == Setting.keyDownCode.right)
-      {
-        System.lastSpin = false;
-        if (System.falldownClock == undefined)
-        {
-          System.lockdownClock = window.clearTimeout(System.lockdownClock);
-          chooseTimeInterval();
-        }
-        if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
-          updatePreviewNow(true);
-      }
-      else if (event.keyCode == Setting.keyDownCode.hold ||
-               event.keyCode == Setting.keyDownCode.softDrop ||
-               event.keyCode == Setting.keyDownCode.hardDrop)
-      {
-        System.lastSpin = false;
-        if (event.keyCode == Setting.keyDownCode.softDrop && Pieces.now.shift(Pieces.next, [1, 0]))
-            updatePieceNow();  
-        else if (event.keyCode == Setting.keyDownCode.hardDrop)
-        {
-          Pieces.next.copy(Pieces.preview);
-          updatePieceNow();
-          System.falldownClock = window.clearInterval(System.falldownClock);
-          lockdownDelay();
-        }
-        else if (event.keyCode == Setting.keyDownCode.hold && System.allowChange)
-        {
-          System.allowChange = false;
-          Pieces.now.draw(false, false, false);
-          if (System.falldownClock != undefined)
-              System.falldownClock = window.clearTimeout(System.falldownClock);
-          if (System.lockdownClock != undefined)
-            System.lockdownClock = window.clearTimeout(System.lockdownClock);
-          if (Panel.hold)
-          {
-            // Piece.now.type  Panel.hold
-            var tempNow = Pieces.now.type;
-            drawSide(0, Panel.hold, false);
-            drawSide(0, Pieces.now.type, true);
-            if (Pieces.now.init(Panel.hold))
-            {
-              Pieces.preview.draw(false, false, false);
-              updatePreviewNow(false);
-              chooseTimeInterval();
-            }
-            Panel.hold = tempNow;
-          }
-          else
-          {
-            drawSide(0, Pieces.now.type, true);
-            Panel.hold = Pieces.now.type;
-            if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
-            {
-              Pieces.preview.draw(false, false, false);
-              updatePreviewNow(false);
-              chooseTimeInterval();
-              for (var index = 1; index <= 6; index += 1)
-              {
-                drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
-                drawSide(index, System.shuffle[System.shufflePointer + index], true);
-              }
-              if (System.shufflePointer == 7) System.shuffleRefresh();
-            }
-          }
-        }
-      }
-    }
-
-    function falldownDelay()
-    {
-      System.falldownClock = window.clearTimeout(System.falldownClock);
-      if (Pieces.now.shift(Pieces.next, [1, 0]))
-      {
-        updatePieceNow();
-        chooseTimeInterval();
-      }
-      else System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
-    }
-
-    function lockdownDelay()
-    {
-      System.lockdownClock = window.clearTimeout(System.lockdownClock);
-      if (Pieces.now.shift(Pieces.next, [1, 0]))
-      {
-        updatePieceNow();
-        chooseTimeInterval();
-      }
-      else if (Pieces.now.draw(true, true, false)) System.gameOver();
-      else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
-      {
-        // detect full line
-        var ptr = 23;
-        var fullLine = new Array();
-        for (var index = 0; index < 24; index += 1)
-          if (System.cellEachLine[index] == 10) fullLine.push(index);
-        for (var index = 23; index >= 0; index -= 1, ptr -= 1)
-        {
-          while (fullLine.includes(ptr)) ptr -= 1;
-          System.accord[index] = ptr;
-        }
-        updateLine();
-        updatePreviewNow(false);
-        System.allowChange = true;
-        chooseTimeInterval();
-        for (var index = 1; index <= 6; index += 1)
-        {
-          drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
-          drawSide(index, System.shuffle[System.shufflePointer + index], true);
-        }
-        if (System.shufflePointer == 7) System.shuffleRefresh();
-      }
-      else System.gameOver();
+        System.falldownClock = window.setTimeout(Game.falldownDelay, Setting.fallTime);
+      else System.lockdownClock = window.setTimeout(Game.lockdownDelay, Setting.lockTime);
     }
 
     function initialize()
@@ -709,7 +711,7 @@
       for (var index = 1; index <= 6; index += 1)
         drawSide(index, System.shuffle[System.shufflePointer + index], true);
       chooseTimeInterval();
-      document.addEventListener('keydown', keyboardEvent);
+      document.addEventListener('keydown', Game.keyboardEvent);
     }
   </script>
 </body>

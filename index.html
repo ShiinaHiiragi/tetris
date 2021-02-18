@@ -181,7 +181,7 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
-      bgm: 1,
+      bgm: 3,
       fallTime: 400,
       lockTime: 500
     }
@@ -258,7 +258,7 @@
       accord: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       sideCount: [6, 4, 4],
       holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
-      bgmList: ["classic.mp3", "t99.mp3", "t99_chip.mp3", "piano.mp3", "ppt.mp3"],
+      bgmList: [null, "classic.mp3", "piano.mp3", "t99.mp3", "t99_50.mp3", "t99_chip.mp3", "ppt_folk.mp3", "ppt_swap.mp3"],
       seList: ["normal.mp3", "put.mp3", "hold.mp3", "erase.mp3"],
       allowChange: true,
       lastSpin: false,
@@ -287,11 +287,14 @@
       },
       loadBGM: function()
       {
-        this.bgm = document.createElement("audio");
-        this.bgm.src = "src/bgm/" + this.bgmList[Setting.bgm];
-        this.bgm.volume = 0.5;
-        this.bgm.loop = true;
-        this.bgm.play();
+        if (Setting.bgm > 0)
+        {
+          this.bgm = document.createElement("audio");
+          this.bgm.src = "src/bgm/" + this.bgmList[Setting.bgm];
+          this.bgm.volume = 0.5;
+          this.bgm.loop = true;
+          this.bgm.play();
+        }
         for (var index = 0; index < 4; index += 1)
         {
           this.se[index] = document.createElement("audio");
@@ -300,7 +303,7 @@
       },
       gameOver: function()
       {
-        this.bgm.pause();
+        if (Setting.bgm > 0) this.bgm.pause();
         if (this.falldownClock != undefined)
           this.falldownClock = window.clearTimeout(this.falldownClock);
         if (this.lockdownClock != undefined)

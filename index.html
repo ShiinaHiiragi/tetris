@@ -181,6 +181,7 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
+      bgm: "t99.mp3",
       fallTime: 400,
       lockTime: 500
     }
@@ -259,6 +260,8 @@
       holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
       allowChange: true,
       lastSpin: false,
+      bgm: null,
+      se: null,
       falldownClock: null,
       lockdownClock: null,
       firstBag: null,
@@ -279,6 +282,24 @@
         this.secondBag = null;
         this.secondBag = [1, 2, 3, 4, 5, 6, 7].sort(() => { return 0.5 - Math.random(); });
         this.shuffle = this.firstBag.concat(this.secondBag);
+      },
+      loadBGM: function()
+      {
+        this.bgm = document.createElement("audio");
+        this.bgm.src = "src/" + Setting.bgm;
+        this.bgm.volume = 0.5;
+        this.bgm.loop = true;
+        this.bgm.play();
+      },
+      gameOver: function()
+      {
+        this.bgm.pause();
+        if (this.falldownClock != undefined)
+          this.falldownClock = window.clearTimeout(this.falldownClock);
+        if (this.lockdownClock != undefined)
+          this.lockdownClock = window.clearTimeout(this.lockdownClock);
+        // TODO: other behavior here
+        alert("Game Over.");
       }
     }
 
@@ -538,16 +559,6 @@
       else System.lockdownClock = window.setTimeout(lockdownDelay, Setting.lockTime);
     }
 
-    function gameOver()
-    {
-      if (System.falldownClock != undefined)
-        System.falldownClock = window.clearTimeout(System.falldownClock);
-      if (System.lockdownClock != undefined)
-        System.lockdownClock = window.clearTimeout(System.lockdownClock);
-      // TODO: other behavior
-      alert("Game Over.");
-    }
-
     function keyboardEvent(event)
     {
       if (event.keyCode == Setting.keyDownCode.leftQuarter ||
@@ -659,7 +670,7 @@
         updatePieceNow();
         chooseTimeInterval();
       }
-      else if (Pieces.now.draw(true, true, false)) gameOver();
+      else if (Pieces.now.draw(true, true, false)) System.gameOver();
       else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
       {
         // detect full line
@@ -683,7 +694,7 @@
         }
         if (System.shufflePointer == 7) System.shuffleRefresh();
       }
-      else gameOver();
+      else System.gameOver();
     }
 
     function initialize()
@@ -691,6 +702,7 @@
       // TODO: delete it later
       document.getElementById("little-button").style.visibility = "hidden";
 
+      System.loadBGM();
       System.shuffleInit();
       Pieces.now.init(System.shuffle[System.shufflePointer]);
       updatePreviewNow(false);

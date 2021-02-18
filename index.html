@@ -487,6 +487,76 @@
 
     var Game =
     {
+      // clear: true: print, false: clear
+      drawSide: function(pos, type, clear)
+      {
+        for (index = 0; index < 4; index += 1)
+        {
+          Cite.sides[pos][System.sidePieces[type][index]].style.backgroundColor = 
+          (clear ? Setting.color[type] : "");
+          Cite.sides[pos][System.sidePieces[type][index]].style.border =
+          (clear ? "1px solid rgb(240, 240, 240)" : "");
+        }
+        return true;
+      },
+      chooseTimeInterval: function()
+      {
+        if (Pieces.now.shift(Pieces.next, [1, 0]))
+          System.falldownClock = window.setTimeout(Game.falldownDelay, Setting.fallTime);
+        else System.lockdownClock = window.setTimeout(Game.lockdownDelay, Setting.lockTime);
+      },
+      updatePieceNow: function ()
+      {
+        Pieces.now.draw(false, false, false);
+        Pieces.next.draw(true, false, false);
+        Pieces.now.copy(Pieces.next);
+      },
+      // mode: true: next, clear, false: Pieces.now, not clear
+      updatePreviewNow: function(mode)
+      {
+        var bias = 1;
+        if (mode)
+        {
+          while (Pieces.next.shift(Pieces.previewNext, [bias, 0])) bias += 1;
+          Pieces.next.shift(Pieces.previewNext, [bias - 1, 0]);
+          Pieces.preview.draw(false, false, false);
+          Pieces.now.draw(false, false, false);
+          Pieces.previewNext.draw(true, false, true);
+          Pieces.next.draw(true, false, false);
+          Pieces.preview.copy(Pieces.previewNext);
+          Pieces.now.copy(Pieces.next);
+        }
+        else
+        {
+          while (Pieces.now.shift(Pieces.preview, [bias, 0])) bias += 1;
+          Pieces.now.shift(Pieces.preview, [bias - 1, 0]);
+          Pieces.preview.draw(true, false, true);
+          Pieces.now.draw(true, false, false);
+        }
+      },
+      updateLine: function()
+      {
+        for (var index = 23; index >= 0; index -= 1)
+          if (index != System.accord[index] && System.accord[index] >= 0)
+          {
+            for (var subIndex = 0; subIndex < 10; subIndex += 1)
+              Panel.cells[index][subIndex] = Panel.cells[System.accord[index]][subIndex];
+            System.cellEachLine[index] = System.cellEachLine[System.accord[index]];
+            if (index >= 4)
+              for (var subIndex = 0; subIndex < 10; subIndex += 1)
+                Cite.cells[index - 4][subIndex].style.backgroundColor =
+                Setting.color[Panel.cells[System.accord[index]][subIndex]];
+          }
+          else if (index != System.accord[index])
+          {
+            for (var subIndex = 0; subIndex < 10; subIndex += 1)
+              Panel.cells[index][subIndex] = 0;
+            System.cellEachLine[index] = 0;
+            if (index >= 4)
+              for (var subIndex = 0; subIndex < 10; subIndex += 1)
+                Cite.cells[index - 4][subIndex].style.backgroundColor = Setting.color[0];
+          }
+      },
       keyboardEvent: function(event)
       {
         if (event.keyCode == Setting.keyDownCode.leftQuarter ||
@@ -500,7 +570,7 @@
           if (System.falldownClock == undefined)
           {
             System.lockdownClock = window.clearTimeout(System.lockdownClock);
-            chooseTimeInterval();
+            Game.chooseTimeInterval();
           }
           var second;
           if (event.keyCode == Setting.keyDownCode.rightQuarter) second = 1;
@@ -508,7 +578,7 @@
           else second = 2;
           var third = (event.keyCode == Setting.keyDownCode.rightHalf ||
                       event.keyCode == Setting.keyDownCode.rightQuarter);
-          if (Pieces.now.rotate(Pieces.next, second, third)) updatePreviewNow(true);
+          if (Pieces.now.rotate(Pieces.next, second, third)) Game.updatePreviewNow(true);
         }
         else if (event.keyCode == Setting.keyDownCode.left ||
                 event.keyCode == Setting.keyDownCode.right)
@@ -517,10 +587,10 @@
           if (System.falldownClock == undefined)
           {
             System.lockdownClock = window.clearTimeout(System.lockdownClock);
-            chooseTimeInterval();
+            Game.chooseTimeInterval();
           }
           if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
-            updatePreviewNow(true);
+            Game.updatePreviewNow(true);
         }
         else if (event.keyCode == Setting.keyDownCode.hold ||
                 event.keyCode == Setting.keyDownCode.softDrop ||
@@ -528,11 +598,11 @@
         {
           System.lastSpin = false;
           if (event.keyCode == Setting.keyDownCode.softDrop && Pieces.now.shift(Pieces.next, [1, 0]))
-              updatePieceNow();  
+              Game.updatePieceNow();  
           else if (event.keyCode == Setting.keyDownCode.hardDrop)
           {
             Pieces.next.copy(Pieces.preview);
-            updatePieceNow();
+            Game.updatePieceNow();
             System.falldownClock = window.clearInterval(System.falldownClock);
             Game.lockdownDelay();
           }
@@ -548,29 +618,29 @@
             {
               // Piece.now.type  Panel.hold
               var tempNow = Pieces.now.type;
-              drawSide(0, Panel.hold, false);
-              drawSide(0, Pieces.now.type, true);
+              Game.drawSide(0, Panel.hold, false);
+              Game.drawSide(0, Pieces.now.type, true);
               if (Pieces.now.init(Panel.hold))
               {
                 Pieces.preview.draw(false, false, false);
-                updatePreviewNow(false);
-                chooseTimeInterval();
+                Game.updatePreviewNow(false);
+                Game.chooseTimeInterval();
               }
               Panel.hold = tempNow;
             }
             else
             {
-              drawSide(0, Pieces.now.type, true);
+              Game.drawSide(0, Pieces.now.type, true);
               Panel.hold = Pieces.now.type;
               if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
               {
                 Pieces.preview.draw(false, false, false);
-                updatePreviewNow(false);
-                chooseTimeInterval();
+                Game.updatePreviewNow(false);
+                Game.chooseTimeInterval();
                 for (var index = 1; index <= 6; index += 1)
                 {
-                  drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
-                  drawSide(index, System.shuffle[System.shufflePointer + index], true);
+                  Game.drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
+                  Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
                 }
                 if (System.shufflePointer == 7) System.shuffleRefresh();
               }
@@ -583,8 +653,8 @@
         System.falldownClock = window.clearTimeout(System.falldownClock);
         if (Pieces.now.shift(Pieces.next, [1, 0]))
         {
-          updatePieceNow();
-          chooseTimeInterval();
+          Game.updatePieceNow();
+          Game.chooseTimeInterval();
         }
         else System.lockdownClock = window.setTimeout(Game.lockdownDelay, Setting.lockTime);
       },
@@ -593,8 +663,8 @@
         System.lockdownClock = window.clearTimeout(System.lockdownClock);
         if (Pieces.now.shift(Pieces.next, [1, 0]))
         {
-          updatePieceNow();
-          chooseTimeInterval();
+          Game.updatePieceNow();
+          Game.chooseTimeInterval();
         }
         else if (Pieces.now.draw(true, true, false)) System.gameOver();
         else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
@@ -609,95 +679,20 @@
             while (fullLine.includes(ptr)) ptr -= 1;
             System.accord[index] = ptr;
           }
-          updateLine();
-          updatePreviewNow(false);
+          Game.updateLine();
+          Game.updatePreviewNow(false);
           System.allowChange = true;
-          chooseTimeInterval();
+          Game.chooseTimeInterval();
           for (var index = 1; index <= 6; index += 1)
           {
-            drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
-            drawSide(index, System.shuffle[System.shufflePointer + index], true);
+            Game.drawSide(index, System.shuffle[System.shufflePointer + index - 1], false);
+            Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
           }
           if (System.shufflePointer == 7) System.shuffleRefresh();
         }
         else System.gameOver();
       }
     };
-    
-    // clear: true: print, false: clear
-    function drawSide(pos, type, clear)
-    {
-      for (index = 0; index < 4; index += 1)
-      {
-        Cite.sides[pos][System.sidePieces[type][index]].style.backgroundColor = 
-        (clear ? Setting.color[type] : "");
-        Cite.sides[pos][System.sidePieces[type][index]].style.border =
-        (clear ? "1px solid rgb(240, 240, 240)" : "");
-      }
-      return true;
-    }
-
-    function updatePieceNow()
-    {
-      Pieces.now.draw(false, false, false);
-      Pieces.next.draw(true, false, false);
-      Pieces.now.copy(Pieces.next);
-    }
-
-    // mode: true: next, clear, false: Pieces.now, not clear
-    function updatePreviewNow(mode)
-    {
-      var bias = 1;
-      if (mode)
-      {
-        while (Pieces.next.shift(Pieces.previewNext, [bias, 0])) bias += 1;
-        Pieces.next.shift(Pieces.previewNext, [bias - 1, 0]);
-        Pieces.preview.draw(false, false, false);
-        Pieces.now.draw(false, false, false);
-        Pieces.previewNext.draw(true, false, true);
-        Pieces.next.draw(true, false, false);
-        Pieces.preview.copy(Pieces.previewNext);
-        Pieces.now.copy(Pieces.next);
-      }
-      else
-      {
-        while (Pieces.now.shift(Pieces.preview, [bias, 0])) bias += 1;
-        Pieces.now.shift(Pieces.preview, [bias - 1, 0]);
-        Pieces.preview.draw(true, false, true);
-        Pieces.now.draw(true, false, false);
-      }
-    }
-
-    function updateLine()
-    {
-      for (var index = 23; index >= 0; index -= 1)
-        if (index != System.accord[index] && System.accord[index] >= 0)
-        {
-          for (var subIndex = 0; subIndex < 10; subIndex += 1)
-            Panel.cells[index][subIndex] = Panel.cells[System.accord[index]][subIndex];
-          System.cellEachLine[index] = System.cellEachLine[System.accord[index]];
-          if (index >= 4)
-            for (var subIndex = 0; subIndex < 10; subIndex += 1)
-              Cite.cells[index - 4][subIndex].style.backgroundColor =
-              Setting.color[Panel.cells[System.accord[index]][subIndex]];
-        }
-        else if (index != System.accord[index])
-        {
-          for (var subIndex = 0; subIndex < 10; subIndex += 1)
-            Panel.cells[index][subIndex] = 0;
-          System.cellEachLine[index] = 0;
-          if (index >= 4)
-            for (var subIndex = 0; subIndex < 10; subIndex += 1)
-              Cite.cells[index - 4][subIndex].style.backgroundColor = Setting.color[0];
-        }
-    }
-
-    function chooseTimeInterval()
-    {
-      if (Pieces.now.shift(Pieces.next, [1, 0]))
-        System.falldownClock = window.setTimeout(Game.falldownDelay, Setting.fallTime);
-      else System.lockdownClock = window.setTimeout(Game.lockdownDelay, Setting.lockTime);
-    }
 
     function initialize()
     {
@@ -707,10 +702,10 @@
       System.loadBGM();
       System.shuffleInit();
       Pieces.now.init(System.shuffle[System.shufflePointer]);
-      updatePreviewNow(false);
+      Game.updatePreviewNow(false);
       for (var index = 1; index <= 6; index += 1)
-        drawSide(index, System.shuffle[System.shufflePointer + index], true);
-      chooseTimeInterval();
+        Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
+      Game.chooseTimeInterval();
       document.addEventListener('keydown', Game.keyboardEvent);
     }
   </script>

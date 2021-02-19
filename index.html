@@ -318,6 +318,7 @@
       positionInit: [null, [2, 5], [3, 4], [3, 4], [3, 4], [3, 4], [3, 4], [3, 5]],
       cellEachLine: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       accord: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      ranking: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       sideCount: [6, 4, 4],
       holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
       bgmList: [null, "classic.mp3", "piano.mp3", "t99.mp3",
@@ -397,6 +398,8 @@
         if (this.lockdownClock != undefined)
           this.lockdownClock = window.clearTimeout(this.lockdownClock);
         Cite.rankingTitle.innerText = message;
+        for (var index = 0; index < 15; index += 1)
+          Cite.rankingRecord.rows[index].cells[1].innerText = System.ranking[index].toString();
         Cite.rankingPanel.style.display = "block";
       },
       printTimer: function(panel, cite)
@@ -509,13 +512,19 @@
             break;
         }
         if (System.lastSpecial && thisSpecial) score += 1;
-        if (System.perfectClear) score += 10;
+        if (System.perfectClear) score += 10, System.ranking[14] += 1;
+        if (Panel.combo > System.ranking[0]) System.ranking[0] = Panel.combo;
         if (Panel.combo < 2) score += 0;
         else if (Panel.combo < 4) score += 1;
         else if (Panel.combo < 6) score += 2;
         else if (Panel.combo < 8) score += 3;
         else if (Panel.combo < 11) score += 4;
         else score += 5;
+        // getting ranking data
+        if (thisSpecial)
+          System.ranking[thisSpecial + 3 + (System.lastSpecial ? 5 : 0)] += 1;
+        else if (eraseLine)
+          System.ranking[eraseLine] += 1;
         return score;
       },
       setColor: function(event, element)
@@ -563,6 +572,7 @@
       startButton: document.getElementById("start-button"),
       rankingPanel: document.getElementById("ranking-panel"),
       rankingTitle: document.getElementById("ranking-title"),
+      rankingRecord: document.getElementById("ranking-record"),
       // cells: a two-dimension array citing the 10 × 20 grid
       cells: new Array(20),
       sides: new Array(7)

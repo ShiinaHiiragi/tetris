@@ -229,7 +229,7 @@
         hardDrop: 38, softDrop: 40
       },
       debugMode: true,
-      bgm: 3,
+      bgm: 1,
       fallTime: 500,
       lockTime: 500
     }
@@ -326,6 +326,9 @@
           this.bgm.loop = true;
           this.bgm.play();
         }
+      },
+      loadSE: function()
+      {
         for (var index = 0; index < 4; index += 1)
         {
           this.se[index] = document.createElement("audio");
@@ -383,16 +386,20 @@
           Cite.info.style.display = "none";
         }, 1000);
       },
-      setColor: function(element)
+      setColor: function(event, element)
       {
         if (System.lockdownClock == undefined)
         {
           if (System.gameStart) Pieces.preview.draw(false, false, false);
-          var bias = 1, str = element.id.split("-");
+          var offset = 0, bias = 1, str = element.id.split("-");
           var xIndex = Number(str[1]) + 4, yIndex = Number(str[2]);
-          var colorIndex = (Panel.cells[xIndex][yIndex] = (Panel.cells[xIndex][yIndex] + 1) % 8);
-          if (colorIndex == 1) System.cellEachLine[xIndex] += 1;
-          else if (colorIndex == 0) System.cellEachLine[xIndex] -= 1;
+          var rawIndex = Panel.cells[xIndex][yIndex];
+          if (event.button == 0) offset = 1;
+          else if (event.button == 1) offset = (rawIndex ? 8 - rawIndex : 1);
+          else offset = 7;
+          var colorIndex = (Panel.cells[xIndex][yIndex] = (rawIndex + offset) % 8);
+          if (colorIndex && !rawIndex) System.cellEachLine[xIndex] += 1;
+          else if (!colorIndex && rawIndex) System.cellEachLine[xIndex] -= 1;
           element.style.backgroundColor = Setting.color[colorIndex];
           if (System.gameStart)
           {
@@ -436,7 +443,7 @@
         Cite.cells[index][subIndex].className = "cell";
         Cite.cells[index][subIndex].id = "cell-" + index.toString() + "-" + subIndex.toString();
         if (Setting.debugMode)
-          Cite.cells[index][subIndex].setAttribute("onclick", "System.setColor(this)");
+          Cite.cells[index][subIndex].setAttribute("onmousedown", "System.setColor(event, this)");
         Cite.field.append(Cite.cells[index][subIndex]);
       }
     Cite.rightSide.style.border = "1.6px solid rgb(225, 225, 225)";
@@ -837,16 +844,18 @@
         else System.gameOver();
       }
     };
+    System.loadSE();
+    System.shuffleInit();
+    Pieces.now.init(System.shuffle[System.shufflePointer]);
+    document.oncontextmenu = function(event) { event.preventDefault(); };
 
     function initialize()
     {
       // TODO: delete it later
-      document.getElementById("start-button").style.visibility = "hidden";
+      document.getElementById("start-button").style.display = "none";
 
       System.gameStart = true;
       System.loadBGM();
-      System.shuffleInit();
-      Pieces.now.init(System.shuffle[System.shufflePointer]);
       Game.updatePreviewNow(false);
       for (var index = 1; index <= 6; index += 1)
         Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);

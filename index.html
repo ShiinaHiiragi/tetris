@@ -338,6 +338,8 @@
       perfectClock: null,
       infoClock: null,
       timerClock: null,
+      falldownClockBackup: null,
+      lockdownClockBackup: null,
       firstBag: null,
       secondBag: null,
       shuffle: null,
@@ -932,6 +934,16 @@
             }
             System.se[2].cloneNode().play();
           }
+        }
+        // if ESC is pressed
+        else if (event.keyCode == 27)
+        {
+          System.falldownClockBackup = System.falldownClock;
+          System.lockdownClockBackup = System.lockdownClock;
+          if (System.falldownClock != undefined)
+            System.falldownClock = window.clearTimeout(System.falldownClock);
+          if (System.lockdownClock != undefined)
+            System.lockdownClock = window.clearTimeout(System.lockdownClock);
         }
       },
       falldownDelay: function()

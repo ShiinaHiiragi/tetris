@@ -18,6 +18,6 @@ var Setting =
   bgm: 3,
   countDown: 500,
   infoTime: 1000,
-  fallTime: 60000,
+  fallTime: 500,
   lockTime: 500
 }

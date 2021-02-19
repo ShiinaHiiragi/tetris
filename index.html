@@ -28,7 +28,7 @@
       min-width: 80vh;
       top: 10vh;
       left: 30vw;
-      background-color: rgba(255, 255, 255, 0.7);
+      background-color: rgba(255, 255, 255, 0.6);
     }
 
     .side {
@@ -42,21 +42,21 @@
       float: left;
       height: 100%;
       width: 40vh;
-      border: 1px solid rgb(225, 225, 225);
+      border: 1px solid rgb(255, 255, 255);
     }
 
     .cell {
       height: 5%;
       width: 10%;
       float: left;
-      background-color: rgb(225, 225, 225);
+      background-color: rgb(210, 210, 210);
       border: 1px solid rgb(240, 240, 240);
     }
 
     .hold {
       width: 100%;
       height: 20vh;
-      border: 1.6px solid rgb(225, 225, 225);
+      border: 1.6px solid rgb(255, 255, 255);
       border-right-width: 0.6px;
     }
 
@@ -144,7 +144,7 @@
     .score {
       width: 100%;
       height: 60vh;
-      border: 1.6px solid rgb(225, 225, 225);
+      border: 1.6px solid rgb(255, 255, 255);
       border-top: 0;
       border-right-width: 0.6px;
     }
@@ -338,8 +338,6 @@
       perfectClock: null,
       infoClock: null,
       timerClock: null,
-      falldownClockBackup: null,
-      lockdownClockBackup: null,
       firstBag: null,
       secondBag: null,
       shuffle: null,
@@ -595,7 +593,7 @@
           Cite.cells[index][subIndex].setAttribute("onmousedown", "System.setColor(event, this)");
         Cite.field.append(Cite.cells[index][subIndex]);
       }
-    Cite.rightSide.style.border = "1.6px solid rgb(225, 225, 225)";
+    Cite.rightSide.style.border = "1.6px solid rgb(255, 255, 255)";
     Cite.rightSide.style.borderLeftWidth = "0.6px";
     for (var index = 1; index <= 6; index += 1)
     {
@@ -938,8 +936,9 @@
         // if ESC is pressed
         else if (event.keyCode == 27)
         {
-          System.falldownClockBackup = System.falldownClock;
-          System.lockdownClockBackup = System.lockdownClock;
+          if (Setting.bgm > 0) System.bgm.pause();
+          document.removeEventListener('keydown', Game.keyboardEvent);
+          System.timerClock = window.clearInterval(System.timerClock);
           if (System.falldownClock != undefined)
             System.falldownClock = window.clearTimeout(System.falldownClock);
           if (System.lockdownClock != undefined)

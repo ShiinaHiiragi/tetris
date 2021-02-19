@@ -14,7 +14,7 @@ var Setting =
     leftQuarter: 90, rightQuarter: 86,
     hardDrop: 38, softDrop: 40
   },
-  debugMode: false,
+  debugMode: true,
   bgm: 3,
   countDown: 500,
   infoTime: 1000,

@@ -210,31 +210,8 @@
   <div class="ui container">
     <button class="ui button" id="start-button" onclick="initialize()"> Start </button>
   </div>
+  <script type="text/javascript" src="src/setting.js"></script>
   <script>
-    // TODO: initializing variables from settings.json
-    var Setting =
-    {
-      color:
-        [
-          "rgb(225, 225, 225)", "rgb(252, 92, 101)",
-          "rgb(253, 150, 68)", "rgb(254, 211, 48)",
-          "rgb(38, 222, 129)", "rgb(69, 170, 242)",
-          "rgb(75, 123, 236)", "rgb(165, 94, 234)"
-        ],
-      keyDownCode:
-      {
-        left: 37, right: 39, hold: 16,
-        leftHalf: 88, rightHalf: 67,
-        leftQuarter: 90, rightQuarter: 86,
-        hardDrop: 38, softDrop: 40
-      },
-      debugMode: true,
-      bgm: 3,
-      countDown: 500,
-      infoTime: 1000,
-      fallTime: 60000,
-      lockTime: 500
-    }
     // process raw setting in the file
     // fallTime: 1 ~ 10; 1: 100ms, 10: 10ms
     // lockTime: 1 ~ 10; 1: 1000ms, 10: 100ms
@@ -460,7 +437,7 @@
         switch (thisSpecial)
         {
           case 1: score += 4; break;
-          case 2: score += 1; break;
+          case 2: score += 0; break;
           case 3: score += 2; break;
           case 4: score += 4; break;
           case 5: score += 6; break;

@@ -16,7 +16,6 @@
 </head>
 
 <body>
-  <!--TODO: add href to button-->
   <div class="overlay"></div>
   <div class="panel">
     <div class="side" id="left-side">
@@ -43,27 +42,27 @@
       <p id="ranking-title"></p>
       <table id="ranking-record">
         <tbody>
-          <tr><td>Max Combo</td><td>11</td></tr>
-          <tr><td>Single</td><td>24</td></tr>
-          <tr><td>Double</td><td>26</td></tr>
-          <tr><td>Triple</td><td>12</td></tr>
-          <tr><td>Tetris</td><td>7</td></tr>
-          <tr><td>T-Spin Mini</td><td>2</td></tr>
-          <tr><td>T-Spin Single</td><td>0</td></tr>
-          <tr><td>T-Spin Double</td><td>8</td></tr>
-          <tr><td>T-Spin Triple</td><td>6</td></tr>
-          <tr><td>B2B Tetris</td><td>0</td></tr>
-          <tr><td>B2B T-Spin Mini</td><td>0</td></tr>
-          <tr><td>B2B T-Spin Single</td><td>2</td></tr>
-          <tr><td>B2B T-Spin Double</td><td>0</td></tr>
-          <tr><td>B2B T-Spin Triple</td><td>0</td></tr>
-          <tr><td>Perfect Clear</td><td>1</td></tr>
+          <tr><td>Max Combo</td><td></td></tr>
+          <tr><td>Single</td><td></td></tr>
+          <tr><td>Double</td><td></td></tr>
+          <tr><td>Triple</td><td></td></tr>
+          <tr><td>Tetris</td><td></td></tr>
+          <tr><td>T-Spin Mini</td><td></td></tr>
+          <tr><td>T-Spin Single</td><td></td></tr>
+          <tr><td>T-Spin Double</td><td></td></tr>
+          <tr><td>T-Spin Triple</td><td></td></tr>
+          <tr><td>B2B Tetris</td><td></td></tr>
+          <tr><td>B2B T-Spin Mini</td><td></td></tr>
+          <tr><td>B2B T-Spin Single</td><td></td></tr>
+          <tr><td>B2B T-Spin Double</td><td></td></tr>
+          <tr><td>B2B T-Spin Triple</td><td></td></tr>
+          <tr><td>Perfect Clear</td><td></td></tr>
         </tbody>
       </table>
       <div class="ui container">
         <div class="ui buttons" id="ranking-button">
           <button class="ui button" style="border-radius: 0;" onclick="location.reload()">Retry</button>
-          <button class="ui button" style="border-radius: 0;">Back to Menu</button>
+          <button class="ui button" style="border-radius: 0;" onclick="document.location.href='menu.html'">Back to Menu</button>
         </div>
       </div>
     </div>
@@ -71,9 +70,12 @@
       <p id="ranking-title">Pause</p>
       <div class="ui container">
         <div class="ui vertical labeled icon buttons" id="pause-menu">
-          <button class="ui button" id="pause-1" onclick="Game.continue()"><i class="play icon"></i>Continue</button>
-          <button class="ui button" id="pause-2" onclick="location.reload()"><i class="redo icon"></i>Retry</button>
-          <button class="ui button" id="pause-3"><i class="tasks icon"></i>Back to Menu</button>
+          <button class="ui button" id="pause-1" onclick="Game.continue()">
+            <i class="play icon"></i>Continue</button>
+          <button class="ui button" id="pause-2" onclick="location.reload()">
+            <i class="redo icon"></i>Retry</button>
+          <button class="ui button" id="pause-3" onclick="document.location.href='menu.html'">
+            <i class="tasks icon"></i>Back to Menu</button>
         </div>
       </div>
     </div>
@@ -82,10 +84,9 @@
   <div class="ui container">
     <div class="ui buttons" id="debug-button">
       <button class="ui button" onclick="initialize()"> Start </button>
-      <button class="ui button"> Back to Menu </button>
+      <button class="ui button" onclick="document.location.href='menu.html'"> Back to Menu </button>
     </div>
   </div>
-  <script type="text/javascript" src="src/setting.js"></script>
   <script type="text/javascript" src="tetris.js"></script>
 </body>
 

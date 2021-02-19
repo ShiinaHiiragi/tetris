@@ -1,3 +1,9 @@
+// tetris.js: JavaScript and Node.JS enviornment
+const fs = require("fs");
+
+// Setting: data that can be changed by user
+var Setting = fs.readFileSync("src/setting.json");
+Setting = JSON.parse(Setting);
 // TODO: process raw setting in the file
 // fallTime: 1 ~ 10; 1: 100ms, 10: 10ms
 // lockTime: 1 ~ 10; 1: 1000ms, 10: 100ms

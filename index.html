@@ -160,7 +160,7 @@
       left: calc((100% - 40vh) / 2);
       top: 24vh;
       z-index: 4;
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.4);
     }
 
     #tinfo {
@@ -228,8 +228,9 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
-      debugMode: true,
-      bgm: 1,
+      debugMode: false,
+      bgm: 3,
+      countDown: 500,
       fallTime: 500,
       lockTime: 500
     }
@@ -336,6 +337,17 @@
           this.se[index].load();
         }
       },
+      asyncTimer: function(delay, execute)
+      {
+        return new Promise(function (resolve)
+        {
+          setTimeout(function ()
+          {
+            execute();
+            resolve();
+          }, delay);
+        });
+      },
       gameOver: function()
       {
         if (Setting.bgm > 0) this.bgm.pause();
@@ -386,6 +398,22 @@
           Cite.info.style.display = "none";
         }, 1000);
       },
+      countDown: async function()
+      {
+        await System.asyncTimer(Setting.countDown, () => { Cite.tinfo.innerText = "3"; });
+        await System.asyncTimer(Setting.countDown, () => { Cite.tinfo.innerText = "2"; });
+        await System.asyncTimer(Setting.countDown, () => { Cite.tinfo.innerText = "1"; });
+        await System.asyncTimer(Setting.countDown, () =>
+        {
+          initialize();
+          Cite.tinfo.innerText = "Start";
+        });
+        await System.asyncTimer(Setting.countDown, () =>
+        {
+          Cite.tinfo.innerText = "";
+          Cite.info.style.display = "none";
+        });
+      },
       setColor: function(event, element)
       {
         if (System.lockdownClock == undefined)
@@ -426,12 +454,12 @@
       info: document.getElementById("info"),
       tinfo: document.getElementById("tinfo"),
       combo: document.getElementById("combo"),
+      startButton: document.getElementById("start-button"),
       // cells: a two-dimension array citing the 10 × 20 grid
       cells: new Array(20),
       sides: new Array(7)
     }
     // process the raw element in the DOM
-    Cite.info.style.display = "none";
     for (var index = 0; index < 20; index += 1)
       Cite.cells[index] = new Array(10).fill(null);
     for (var index = 0; index < 7; index += 1)
@@ -849,11 +877,16 @@
     Pieces.now.init(System.shuffle[System.shufflePointer]);
     document.oncontextmenu = function(event) { event.preventDefault(); };
 
+    if (Setting.debugMode) Cite.info.style.display = "none";
+    else
+    {
+      Cite.startButton.style.display = "none";
+      Cite.tinfo.innerText = "Ready";
+      window.setTimeout(System.countDown, Setting.countDown);
+    }
+
     function initialize()
     {
-      // TODO: delete it later
-      document.getElementById("start-button").style.display = "none";
-
       System.gameStart = true;
       System.loadBGM();
       Game.updatePreviewNow(false);

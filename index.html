@@ -182,7 +182,7 @@
       color: black;
     }
 
-    #start-button {
+    #debug-button {
       position: absolute;
       top: 90vh;
       left: 30vw;
@@ -191,9 +191,6 @@
       min-width: 80vh;
       max-height: 10vh;
       background-color: rgb(210, 210, 210);
-    }
-    #start-button:hover {
-      background-color: rgb(200, 200, 200);
     }
 
     .ranking-panel {
@@ -219,6 +216,23 @@
       height: 40vh;
       font-size: 2.4vh;
       text-align: left;
+    }
+
+    .pause-panel {
+      position: absolute;
+      height: 80vh;
+      width: 40vw;
+      min-width: 80vh;
+      z-index: 5;
+      background-color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+      user-select: none;
+      padding-top: 16vh;
+    }
+
+    #pause-menu {
+      margin-top: 4vh;
+      width: 32vh;
     }
   </style>
 </head>
@@ -268,17 +282,23 @@
         </tbody>
       </table>
     </div>
-    <!--
-      <div class="ranking-panel" id = "ranking-panel">
-        <p id="ranking-title">Pause</p>
-        <div class="ui container">
-          <button class="ui button">Resume</button>
+    <div class="pause-panel" id="pause-panel">
+      <p id="ranking-title">Pause</p>
+      <div class="ui container">
+        <div class="ui vertical labeled icon buttons" id="pause-menu">
+          <button class="ui button" id="pause-1" onclick="Game.continue()"><i class="play icon"></i>Continue</button>
+          <button class="ui button" id="pause-2" onclick="location.reload()"><i class="redo icon"></i>Retry</button>
+          <button class="ui button" id="pause-3"><i class="tasks icon"></i>Back to Menu</button>
         </div>
       </div>
-    -->
+    </div>
   </div>
+
   <div class="ui container">
-    <button class="ui button" id="start-button" onclick="initialize()"> Start </button>
+    <div class="ui buttons" id="debug-button">
+      <button class="ui button" id="start-button" onclick="initialize()"> Start </button>
+      <button class="ui button"> Back to Menu </button>
+    </div>
   </div>
   <script type="text/javascript" src="src/setting.js"></script>
   <script>
@@ -571,7 +591,6 @@
     // Cite: the element in the HTML DOM
     var Cite =
     {
-      rightSide: document.getElementById("right-side"),
       field: document.getElementById("field"),
       hour: document.getElementById("hour"),
       minute: document.getElementById("minute"),
@@ -581,16 +600,20 @@
       info: document.getElementById("info"),
       tinfo: document.getElementById("tinfo"),
       combo: document.getElementById("combo"),
+      rightSide: document.getElementById("right-side"),
       perfectClear: document.getElementById("perfect-clear"),
-      startButton: document.getElementById("start-button"),
+      debugButton: document.getElementById("debug-button"),
       rankingPanel: document.getElementById("ranking-panel"),
       rankingTitle: document.getElementById("ranking-title"),
       rankingRecord: document.getElementById("ranking-record"),
+      pausePanel: document.getElementById("pause-panel"),
       // cells: a two-dimension array citing the 10 × 20 grid
       cells: new Array(20),
       sides: new Array(7)
     }
     document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+    for (var index = 1; index <= 3; index += 1)
+      document.getElementById("pause-" + index.toString()).style.borderRadius = "0";
     // process the raw element in the DOM
     for (var index = 0; index < 20; index += 1)
       Cite.cells[index] = new Array(10).fill(null);
@@ -949,8 +972,10 @@
         // if ESC is pressed
         else if (event.keyCode == 27)
         {
+          Cite.pausePanel.style.display = "block";
           if (Setting.bgm > 0) System.bgm.pause();
           document.removeEventListener('keydown', Game.keyboardEvent);
+          document.addEventListener('keydown', Game.pauseKeyboardEvent);
           System.timerClock = window.clearInterval(System.timerClock);
           if (System.falldownClock != undefined)
             System.falldownClock = window.clearTimeout(System.falldownClock);
@@ -958,6 +983,15 @@
             System.lockdownClock = window.clearTimeout(System.lockdownClock);
         }
       },
+      continue: function()
+      {
+        Cite.pausePanel.style.display = "none";
+        if (Setting.bgm > 0) System.bgm.play();
+        document.removeEventListener('keydown', Game.pauseKeyboardEvent);
+        document.addEventListener('keydown', Game.keyboardEvent);
+        Game.chooseTimeInterval();
+      },
+      pauseKeyboardEvent: function() { if (event.keyCode == 27) Game.continue(); },
       falldownDelay: function()
       {
         System.falldownClock = window.clearTimeout(System.falldownClock);
@@ -1028,27 +1062,28 @@
     System.loadSE();
     System.shuffleInit();
     Cite.rankingPanel.style.display = "none";
+    Cite.pausePanel.style.display = "none";
     Pieces.now.init(System.shuffle[System.shufflePointer], false);
     document.oncontextmenu = function(event) { event.preventDefault(); };
 
     if (Setting.debugMode) Cite.info.style.display = "none";
     else
     {
-      Cite.startButton.style.display = "none";
+      Cite.debugButton.style.display = "none";
       Cite.tinfo.innerText = "Ready";
       window.setTimeout(System.countDown, Setting.countDown);
     }
 
     function initialize()
     {
-      if (Setting.debugMode) Cite.startButton.style.display = "none";
+      if (Setting.debugMode) Cite.debugButton.style.display = "none";
       System.gameStart = true;
       System.loadBGM();
       Game.updatePreviewNow(false);
       for (var index = 1; index <= 6; index += 1)
         Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
       Game.chooseTimeInterval();
-      System.timerClock = window.setInterval(System.refreshTimer, 1000);
+      System.timerClock = window.setInterval(System.refreshTimer, 1000); 
       document.addEventListener('keydown', Game.keyboardEvent);
     }
   </script>

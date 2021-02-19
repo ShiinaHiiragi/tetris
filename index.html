@@ -13,10 +13,6 @@
 
   <!-- Customized Resources -->
   <style>
-    body {
-      background-image: url("src/bg/bg.jpg");
-    }
-
     .overlay {
       position: absolute;
       width: 100%;
@@ -203,6 +199,7 @@
       z-index: 5;
       background-color: rgba(255, 255, 255, 0.8);
       text-align: center;
+      user-select: none;
       padding-top: 8vh;
     }
 
@@ -215,7 +212,7 @@
       margin: auto;
       width: 32vh;
       height: 40vh;
-      font-size: 3vh;
+      font-size: 2.4vh;
       text-align: left;
     }
   </style>
@@ -244,50 +241,25 @@
     <div class="side" id="right-side">
       <div class="next-text"><p>Next</p></div>
     </div>
-    <div class="ranking-panel" hidden>
+    <div class="ranking-panel" id = "ranking-panel">
       <p id="ranking-title">LOCK OUT</p>
       <table id="ranking-record">
         <tbody>
-          <tr>
-            <td>Max Combo</td>
-            <td>11</td>
-          </tr>
-          <tr>
-            <td>Single</td>
-            <td>24</td>
-          </tr>
-          <tr>
-            <td>Double</td>
-            <td>26</td>
-          </tr>
-          <tr>
-            <td>Triple</td>
-            <td>12</td>
-          </tr>
-          <tr>
-            <td>Tetris</td>
-            <td>7</td>
-          </tr>
-          <tr>
-            <td>T-Spin Mini</td>
-            <td>2</td>
-          </tr>
-          <tr>
-            <td>T-Spin Single</td>
-            <td>0</td>
-          </tr>
-          <tr>
-            <td>T-Spin Double</td>
-            <td>8</td>
-          </tr>
-          <tr>
-            <td>T-Spin Triple</td>
-            <td>6</td>
-          </tr>
-          <tr>
-            <td>Perfect Clear</td>
-            <td>1</td>
-          </tr>
+          <tr><td>Max Combo</td><td>11</td></tr>
+          <tr><td>Single</td><td>24</td></tr>
+          <tr><td>Double</td><td>26</td></tr>
+          <tr><td>Triple</td><td>12</td></tr>
+          <tr><td>Tetris</td><td>7</td></tr>
+          <tr><td>T-Spin Mini</td><td>2</td></tr>
+          <tr><td>T-Spin Single</td><td>0</td></tr>
+          <tr><td>T-Spin Double</td><td>8</td></tr>
+          <tr><td>T-Spin Triple</td><td>6</td></tr>
+          <tr><td>B2B Tetris</td><td>0</td></tr>
+          <tr><td>B2B T-Spin Mini</td><td>0</td></tr>
+          <tr><td>B2B T-Spin Single</td><td>2</td></tr>
+          <tr><td>B2B T-Spin Double</td><td>0</td></tr>
+          <tr><td>B2B T-Spin Triple</td><td>0</td></tr>
+          <tr><td>Perfect Clear</td><td>1</td></tr>
         </tbody>
       </table>
     </div>
@@ -415,7 +387,7 @@
           }, delay);
         });
       },
-      gameOver: function()
+      gameOver: function(message)
       {
         if (Setting.bgm > 0) this.bgm.pause();
         System.timerClock = window.clearInterval(System.timerClock);
@@ -424,8 +396,8 @@
           this.falldownClock = window.clearTimeout(this.falldownClock);
         if (this.lockdownClock != undefined)
           this.lockdownClock = window.clearTimeout(this.lockdownClock);
-        // TODO: other behavior here
-        alert("Game Over.");
+        Cite.rankingTitle.innerText = message;
+        Cite.rankingPanel.style.display = "block";
       },
       printTimer: function(panel, cite)
       {
@@ -589,10 +561,13 @@
       combo: document.getElementById("combo"),
       perfectClear: document.getElementById("perfect-clear"),
       startButton: document.getElementById("start-button"),
+      rankingPanel: document.getElementById("ranking-panel"),
+      rankingTitle: document.getElementById("ranking-title"),
       // cells: a two-dimension array citing the 10 × 20 grid
       cells: new Array(20),
       sides: new Array(7)
     }
+    document.body.style.backgroundImage = "url('src/img/bg.jpg')";
     // process the raw element in the DOM
     for (var index = 0; index < 20; index += 1)
       Cite.cells[index] = new Array(10).fill(null);
@@ -967,7 +942,7 @@
           Game.updatePieceNow();
           Game.chooseTimeInterval();
         }
-        else if (Pieces.now.draw(true, true, false)) System.gameOver();
+        else if (Pieces.now.draw(true, true, false)) System.gameOver("LOCK OUT");
         else if (Pieces.now.init(System.shuffle[++System.shufflePointer], true))
         {
           var sum = 0, ptr = 23, fullLine = new Array(), thisSpecial;
@@ -1013,11 +988,12 @@
           }
           if (System.shufflePointer == 7) System.shuffleRefresh();
         }
-        else System.gameOver();
+        else System.gameOver("LOCK OUT");
       }
     };
     System.loadSE();
     System.shuffleInit();
+    Cite.rankingPanel.style.display = "none";
     Pieces.now.init(System.shuffle[System.shufflePointer], false);
     document.oncontextmenu = function(event) { event.preventDefault(); };
 

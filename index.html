@@ -67,7 +67,7 @@
       font-size: 3.6vh;
       text-align: center;
       user-select: none;
-      color: black;
+      color: rgba(0, 0, 0, 0.8);
     }
 
     .hold-piece {
@@ -127,7 +127,7 @@
       font-size: 3.6vh;
       text-align: center;
       user-select: none;
-      color: black;
+      color: rgba(0, 0, 0, 0.8);
     }
 
     .combo {
@@ -156,6 +156,7 @@
       user-select: none;
       padding-top: 4vh;
       font-size: 3vh;
+      color: rgba(0, 0, 0, 0.8);
     }
 
     .score-bar>p {
@@ -189,6 +190,10 @@
       width: 40vw;
       min-width: 80vh;
       max-height: 10vh;
+      background-color: rgb(210, 210, 210);
+    }
+    #start-button:hover {
+      background-color: rgb(200, 200, 200);
     }
 
     .ranking-panel {
@@ -263,6 +268,14 @@
         </tbody>
       </table>
     </div>
+    <!--
+      <div class="ranking-panel" id = "ranking-panel">
+        <p id="ranking-title">Pause</p>
+        <div class="ui container">
+          <button class="ui button">Resume</button>
+        </div>
+      </div>
+    -->
   </div>
   <div class="ui container">
     <button class="ui button" id="start-button" onclick="initialize()"> Start </button>

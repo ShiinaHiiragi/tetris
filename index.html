@@ -228,10 +228,10 @@
         leftQuarter: 90, rightQuarter: 86,
         hardDrop: 38, softDrop: 40
       },
-      debugMode: false,
+      debugMode: true,
       bgm: 3,
       countDown: 500,
-      fallTime: 500,
+      fallTime: 60000,
       lockTime: 500
     }
     // process raw setting in the file
@@ -288,8 +288,10 @@
       bgmList: [null, "classic.mp3", "piano.mp3", "t99.mp3",
                 "t99_50.mp3", "t99_chip.mp3", "ppt_folk.mp3", "ppt_swap.mp3"],
       seList: ["normal.mp3", "put.mp3", "hold.mp3", "erase.mp3"],
+      infoList: [null, "Tetris", "T-Spin Mini", "T-Spin Single", "T-Spin Double", "T-Spin Triple", "Prevented: Locking Down"],
       allowChange: true,
       lastSpin: false,
+      lastSpecial: false,
       gameStart: false,
       bgm: null,
       se: [null, null, null, null],
@@ -385,11 +387,11 @@
           Cite.combo.innerText = "";
         }, 1000);
       },
-      printInfo: function(message)
+      printInfo: function(message, b2b)
       {
         if (System.infoClock != undefined)
         System.infoClock = window.clearTimeout(System.infoClock);
-        Cite.tinfo.innerText = message;
+        Cite.tinfo.innerText = (b2b ? "B2B " : "") + System.infoList[message];
         Cite.info.style.display = "block";
         System.infoClock = window.setTimeout(function()
         {
@@ -413,6 +415,30 @@
           Cite.tinfo.innerText = "";
           Cite.info.style.display = "none";
         });
+      },
+      countBlock: function()
+      {
+        var res = 0;
+        var xIndex = Pieces.last.position[0], yIndex = Pieces.last.position[1];
+        [1, -1].forEach((xOffset) =>
+        {
+          [1, -1].forEach((yOffset) =>
+          {
+            if ((xIndex + xOffset >= 0) && (xIndex + xOffset <= 23) &&
+                (yIndex + yOffset >= 0) && (yIndex + yOffset <= 9) &&
+                Panel.cells[xIndex + xOffset][yIndex + yOffset])
+              res += 1;
+          });
+        });
+        return res;
+      },
+      specialJudge: function(eraseLine)
+      {
+        // [No, Tetris, TSM, TSS, TSD, TST]
+        if (Pieces.last.type == 4 && System.lastSpin && System.countBlock() > 2)
+          return Math.min(5, 2 + eraseLine);
+        else if (eraseLine > 3) return 1;
+        else return 0;
       },
       setColor: function(event, element)
       {
@@ -438,7 +464,7 @@
             Pieces.now.draw(true, false, false);
           }
         }
-        else System.printInfo("Prevented: Locking Down");
+        else System.printInfo("Prevented: Locking Down", false);
       }
     }
 
@@ -525,8 +551,9 @@
         this.direction = direct;
       }
 
-      init(index)
+      init(index, saveLast)
       {
+        if (saveLast) Pieces.last.copy(this);
         this.type = index;
         this.direction = 0;
         this.position = [System.positionInit[index][0], System.positionInit[index][1]];
@@ -633,7 +660,7 @@
     var Pieces =
     {
       now: new Piece(), next: new Piece(), try: new Piece(),
-      preview: new Piece(), previewNext: new Piece()
+      preview: new Piece(), previewNext: new Piece(), last: new Piece()
     }
 
     var Game =
@@ -785,7 +812,7 @@
               var tempNow = Pieces.now.type;
               Game.drawSide(0, Panel.hold, false);
               Game.drawSide(0, Pieces.now.type, true);
-              if (Pieces.now.init(Panel.hold))
+              if (Pieces.now.init(Panel.hold, false))
               {
                 Pieces.preview.draw(false, false, false);
                 Game.updatePreviewNow(false);
@@ -797,7 +824,7 @@
             {
               Game.drawSide(0, Pieces.now.type, true);
               Panel.hold = Pieces.now.type;
-              if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
+              if (Pieces.now.init(System.shuffle[++System.shufflePointer], false))
               {
                 Pieces.preview.draw(false, false, false);
                 Game.updatePreviewNow(false);
@@ -833,11 +860,9 @@
           Game.chooseTimeInterval();
         }
         else if (Pieces.now.draw(true, true, false)) System.gameOver();
-        else if (Pieces.now.init(System.shuffle[++System.shufflePointer]))
+        else if (Pieces.now.init(System.shuffle[++System.shufflePointer], true))
         {
-          // detect full line
-          var ptr = 23;
-          var fullLine = new Array();
+          var ptr = 23, fullLine = new Array(), thisSpecial;
           for (var index = 0; index < 24; index += 1)
             if (System.cellEachLine[index] == 10) fullLine.push(index);
           if (fullLine.length)
@@ -850,9 +875,13 @@
           }
           else
           {
-            System.se[1].cloneNode().play();
             Panel.combo = 0;
+            System.se[1].cloneNode().play();
           }
+          thisSpecial = System.specialJudge(fullLine.length);
+          if (thisSpecial) System.printInfo(thisSpecial, System.lastSpecial);
+          if (fullLine.length) System.lastSpecial = thisSpecial;
+          // erase the full lines
           for (var index = 23; index >= 0; index -= 1, ptr -= 1)
           {
             while (fullLine.includes(ptr)) ptr -= 1;
@@ -874,7 +903,7 @@
     };
     System.loadSE();
     System.shuffleInit();
-    Pieces.now.init(System.shuffle[System.shufflePointer]);
+    Pieces.now.init(System.shuffle[System.shufflePointer], false);
     document.oncontextmenu = function(event) { event.preventDefault(); };
 
     if (Setting.debugMode) Cite.info.style.display = "none";
@@ -887,6 +916,7 @@
 
     function initialize()
     {
+      if (Setting.debugMode) Cite.startButton.style.display = "none";
       System.gameStart = true;
       System.loadBGM();
       Game.updatePreviewNow(false);

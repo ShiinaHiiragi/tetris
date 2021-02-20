@@ -20,9 +20,10 @@
     "hardDrop": 38,
     "softDrop": 40
   },
-  "mode": 0,
-  "debugMode": false,
   "bgm": 3,
+  "sprintMode": false,
+  "debugMode": false,
+  "sprintLine": 40,
   "countDown": 500,
   "infoTime": 1000,
   "fallTime": 500,

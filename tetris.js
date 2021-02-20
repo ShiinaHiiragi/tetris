@@ -760,7 +760,8 @@ var Game =
         Panel.combo += 1;
         if (Panel.combo > 1) System.printCombo();
         System.se[3].cloneNode().play();
-        Panel.line += fullLine.length;
+        if (Setting.sprintMode) Panel.line -= fullLine.length;
+        else Panel.line += fullLine.length;
         Cite.line.innerText = Panel.line.toString();
       }
       else
@@ -790,6 +791,7 @@ var Game =
         Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
       }
       if (System.shufflePointer == 7) System.shuffleRefresh();
+      if (Setting.sprintLine && Panel.line <= 0) System.gameOver("ACCOMPLISHED");
     }
     else System.gameOver("BLOCK OUT");
   }
@@ -799,6 +801,11 @@ System.shuffleInit();
 Cite.rankingPanel.style.display = "none";
 Cite.pausePanel.style.display = "none";
 Cite.pauseText.innerHTML = "Pause";
+if (Setting.sprintMode)
+{
+  Panel.line = Setting.sprintLine;
+  Cite.line.innerText = Setting.sprintLine.toString();
+}
 Pieces.now.init(System.shuffle[System.shufflePointer], false);
 document.oncontextmenu = function(event) { event.preventDefault(); };
 

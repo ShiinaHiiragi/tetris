@@ -52,12 +52,7 @@
       <p id="menu-text">TETRIS</p>
     </div>
     <div class="ui container" id="menu-button-panel">
-      <div class="ui vertical buttons" id="menu-button">
-        <button class="ui button" style="border-radius: 0;" onclick="enterTetris(true)">Sprint</button>
-        <button class="ui button" style="border-radius: 0;" onclick="enterTetris(false)">Marathon</button>
-        <button class="ui button" style="border-radius: 0;" onclick="location.reload()">Setting</button>
-        <button class="ui button" style="border-radius: 0;" onclick="remote.app.quit()">Exit</button>
-      </div>
+      <div class="ui vertical buttons" id="menu-button"></div>
     </div>
   </div>
 
@@ -67,8 +62,16 @@
     const fs = require("fs");
     var Setting = JSON.parse(fs.readFileSync("src/setting.json"));
     var titleColor = rgbToRGBA(Setting.color[Math.floor(Math.random() * 7 + 1)], 0.6);
+    var menuButton = document.getElementById("menu-button");
+    var menuText = document.getElementById("menu-text");
+
     document.body.style.backgroundImage = "url('src/img/bg.jpg')";
-    document.getElementById("menu-text").style.color = titleColor;
+    menuText.innerText = "TETRIS";
+    menuText.style.color = titleColor;
+    addButton(menuButton, "Sprint", "enterTetris(true)");
+    addButton(menuButton, "Marathon", "enterTetris(false)");
+    addButton(menuButton, "Setting", "location.reload()");
+    addButton(menuButton, "Exit", "remote.app.quit()");
 
     function enterTetris(mode)
     {
@@ -83,6 +86,16 @@
       for (var index= 0; index < rgbArray.length; index += 1)
         rgbArray[index] = Number(rgbArray[index]);
       return `rgba(${rgbArray[0]}, ${rgbArray[1]}, ${rgbArray[2]}, ${opacity})`;
+    }
+
+    function addButton(div, text, func)
+    {
+      var newButton = document.createElement("button");
+      newButton.className = "ui button";
+      newButton.style.borderRadius = "0";
+      newButton.setAttribute("onclick", func);
+      newButton.innerText = text;
+      div.append(newButton);
     }
   </script>
 </body>

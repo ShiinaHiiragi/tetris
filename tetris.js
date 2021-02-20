@@ -128,6 +128,7 @@ var System =
     if (Setting.bgm > 0) this.bgm.pause();
     System.timerClock = window.clearInterval(System.timerClock);
     document.removeEventListener('keydown', Game.keyboardEvent);
+    document.addEventListener('keydown', Game.lastKeyboardEvent);
     if (this.falldownClock != undefined)
       this.falldownClock = window.clearTimeout(this.falldownClock);
     if (this.lockdownClock != undefined)
@@ -727,6 +728,7 @@ var Game =
     Game.chooseTimeInterval();
   },
   pauseKeyboardEvent: function() { if (event.keyCode == 27) Game.continue(); },
+  lastKeyboardEvent: function() { if (event.keyCode == 27) document.location.href='menu.html'; },
   falldownDelay: function()
   {
     System.falldownClock = window.clearTimeout(System.falldownClock);

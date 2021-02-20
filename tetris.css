@@ -207,6 +207,7 @@
   width: 32vh;
   height: 40vh;
   font-size: 2.4vh;
+  line-height: 3.2vh;
   text-align: left;
 }
 
@@ -225,5 +226,5 @@
 
 #pause-menu {
   margin-top: 4vh;
-  width: 32vh;
+  width: 36vh;
 }

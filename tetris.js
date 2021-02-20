@@ -791,7 +791,7 @@ var Game =
         Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
       }
       if (System.shufflePointer == 7) System.shuffleRefresh();
-      if (Setting.sprintLine && Panel.line <= 0) System.gameOver("ACCOMPLISHED");
+      if (Setting.sprintMode && Panel.line <= 0) System.gameOver("ACCOMPLISHED");
     }
     else System.gameOver("BLOCK OUT");
   }

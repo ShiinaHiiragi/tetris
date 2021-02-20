@@ -14,26 +14,22 @@
   <!-- Customized Resources -->
   <link rel="stylesheet" type="text/css" href="tetris.css">
   <style>
-    .menu-title-field {
+    .menu-title {
       position: absolute;
-      height: 18vh;
+      width: 72%;
+      height: 24vh;
       top: 16vh;
-      font-size: 18vh;
+      left: 14%;
+      font-size: 16vh;
       text-align: center;
-      margin: auto;
+      color: rgba(255, 255, 255, 0.6);
+      background-color: rgba(33, 37, 41, 0.5);
     }
 
-    #menu-title {
-      float: left;
-      line-height: 18vh;
+    #menu-text {
+      user-select: none;
+      line-height: 24vh;
       margin-bottom: 0;
-    }
-
-    #menu-buttons-panel {
-      position: absolute;
-      width: 32vh;
-      top: 40vh;
-      left: calc((100% - 32vh) / 2);
     }
   </style>
 </head>
@@ -41,21 +37,14 @@
 <body>
   <div class="overlay"></div>
   <div class="panel" id="panel">
-    <div class="menu-title-field" id="menu-title-field">
-      <p id="menu-title">TETRIS</p>
-    </div>
-    <div class="ui container" id="menu-buttons-panel">
-      <div class="ui vertical buttons" id="menu-buttons">
-        <button class="ui button" id="pause-1" onclick="document.location.href='tetris.html'">Start</button>
-        <button class="ui button" id="pause-2" onclick="">Setting</button>
-        <button class="ui button" id="pause-3" onclick="remote.app.exit()">Exit</button>
-      </div>
+    <div class="menu-title">
+      <p id="menu-text">TETRIS</p>
     </div>
   </div>
 
   <script>
-    const electron = require("electron");
-    const remote = electron.remote;
+    // const electron = require("electron");
+    // const remote = electron.remote;
     document.body.style.backgroundImage = "url('src/img/bg.jpg')";
   </script>
 </body>

@@ -2,7 +2,7 @@
 const electron = require("electron");
 const remote = electron.remote;
 const fs = require("fs");
-var Setting = JSON.parse(fs.readFileSync("src/setting.json"));
+var Setting = JSON.parse(fs.readFileSync("src/code/setting.json"));
 var titleColor = rgbToRGBA(Setting.color[Math.floor(Math.random() * 7 + 1)], 0.6);
 var menuButton = document.getElementById("menu-button");
 var menuText = document.getElementById("menu-text");
@@ -20,7 +20,7 @@ addButton(menuButton, "Exit", "remote.app.quit()");
 function enterTetris(mode)
 {
   Setting.sprintMode = mode;
-  fs.writeFileSync("src/setting.json", JSON.stringify(Setting));
+  fs.writeFileSync("src/code/setting.json", JSON.stringify(Setting));
   document.location.href = "tetris.html";
 }
 

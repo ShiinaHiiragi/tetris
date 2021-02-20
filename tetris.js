@@ -2,7 +2,7 @@
 const fs = require("fs");
 
 // Setting: data that can be changed by user
-var Setting = fs.readFileSync("src/setting.json");
+var Setting = fs.readFileSync("src/code/setting.json");
 Setting = JSON.parse(Setting);
 // TODO: process raw setting in the file
 // fallTime: 1 ~ 10; 1: 100ms, 10: 10ms

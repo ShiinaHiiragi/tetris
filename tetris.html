@@ -1,12 +1,9 @@
 <!DOCTYPE HTML>
-
 <html>
-
 <head>
   <title>Tetris</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <!-- Dependency Include Here -->
   <link href="./semantic/dist/semantic.min.css" rel="stylesheet" type="text/css">
   <script src="./semantic/dist/semantic.min.js"></script>
@@ -60,31 +57,19 @@
         </tbody>
       </table>
       <div class="ui container">
-        <div class="ui buttons" id="ranking-button">
-          <button class="ui button" style="border-radius: 0;" onclick="location.reload()">Retry</button>
-          <button class="ui button" style="border-radius: 0;" onclick="document.location.href='menu.html'">Back to Menu</button>
-        </div>
+        <div class="ui buttons" id="ranking-button"></div>
       </div>
     </div>
     <div class="pause-panel" id="pause-panel">
       <p id="ranking-title">Pause</p>
       <div class="ui container">
-        <div class="ui vertical buttons" id="pause-menu">
-          <button class="ui button" id="pause-1" onclick="Game.continue()">Continue</button>
-          <button class="ui button" id="pause-2" onclick="location.reload()">Retry</button>
-          <button class="ui button" id="pause-3" onclick="document.location.href='menu.html'">Back to Menu</button>
-        </div>
+        <div class="ui vertical buttons" id="pause-menu"></div>
       </div>
     </div>
   </div>
-
   <div class="ui container">
-    <div class="ui buttons" id="debug-button">
-      <button class="ui button" onclick="initialize()"> Start </button>
-      <button class="ui button" onclick="document.location.href='menu.html'"> Back to Menu </button>
-    </div>
+    <div class="ui buttons" id="debug-button"></div>
   </div>
   <script type="text/javascript" src="tetris.js"></script>
 </body>
-
 </html>

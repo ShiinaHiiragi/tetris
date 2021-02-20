@@ -18,7 +18,7 @@
     "hardDrop": 38,
     "softDrop": 40
   },
-  "debugMode": true,
+  "debugMode": false,
   "bgm": 3,
   "countDown": 500,
   "infoTime": 1000,

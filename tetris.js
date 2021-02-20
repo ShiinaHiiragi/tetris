@@ -308,19 +308,51 @@ var Cite =
   rankingPanel: document.getElementById("ranking-panel"),
   rankingTitle: document.getElementById("ranking-title"),
   rankingRecord: document.getElementById("ranking-record"),
+  rankingButton: document.getElementById("ranking-button"),
   pausePanel: document.getElementById("pause-panel"),
+  pauseMenu: document.getElementById("pause-menu"),
+  // button: Start, Continue, Retry, Back to Menu
+  spawnButton: function(self, type)
+  {
+    var newButton = document.createElement("button");
+    newButton.className = "ui button";
+    newButton.style.borderRadius = "0";
+    switch (type)
+    {
+      case 1:
+        newButton.innerText = "Start";
+        newButton.setAttribute("onclick", "initialize()");
+        break;
+      case 2:
+        newButton.innerText = "Continue";
+        newButton.setAttribute("onclick", "Game.continue()");
+        break;
+      case 3:
+        newButton.innerText = "Retry";
+        newButton.setAttribute("onclick", "location.reload()");
+        break;
+      case 4:
+        newButton.innerText = "Back to Menu";
+        newButton.setAttribute("onclick", "document.location.href='menu.html'");
+        break;
+    }
+    self.append(newButton);
+  },
   // cells: a two-dimension array citing the 10 × 20 grid
   cells: new Array(20),
   sides: new Array(7)
 }
 document.body.style.backgroundImage = "url('src/img/bg.jpg')";
-for (var index = 1; index <= 3; index += 1)
-  document.getElementById("pause-" + index.toString()).style.borderRadius = "0";
-// process the raw element in the DOM
 for (var index = 0; index < 20; index += 1)
   Cite.cells[index] = new Array(10).fill(null);
 for (var index = 0; index < 7; index += 1)
   Cite.sides[index] = new Array(14).fill(null);
+// add button in the game
+var eachOne = [2, 3, 4];
+[1, 4].forEach((type) => { Cite.spawnButton(Cite.debugButton, type); });
+eachOne.forEach((type) => { Cite.spawnButton(Cite.pauseMenu, type); });
+[3, 4].forEach((type) => { Cite.spawnButton(Cite.rankingButton, type); });
+// process the raw element in the DOM
 for (var index = 0; index < 20; index += 1)
   for (var subIndex = 0; subIndex < 10; subIndex += 1)
   {

@@ -21,6 +21,7 @@
     "softDrop": 40
   },
   "bgm": 3,
+  "randomColor": false,
   "sprintMode": false,
   "debugMode": false,
   "sprintLine": 40,

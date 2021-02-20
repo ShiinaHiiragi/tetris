@@ -790,7 +790,7 @@ var Game =
       }
       if (System.shufflePointer == 7) System.shuffleRefresh();
     }
-    else System.gameOver("LOCK OUT");
+    else System.gameOver("BLOCK OUT");
   }
 };
 System.loadSE();

@@ -14,7 +14,7 @@ if (Setting.randomColor) menuText.style.color = titleColor;
 else menuText.style.color = "rgba(0, 0, 0, 0.6)";
 addButton(menuButton, "Sprint", "enterTetris(true)");
 addButton(menuButton, "Marathon", "enterTetris(false)");
-addButton(menuButton, "Setting", "location.reload()");
+addButton(menuButton, "Setting", "document.location.href = 'setting.html'");
 addButton(menuButton, "Exit", "remote.app.quit()");
 
 function enterTetris(mode)

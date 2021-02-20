@@ -232,3 +232,31 @@
   margin-top: 4vh;
   width: 36vh;
 }
+
+.menu-title {
+  position: absolute;
+  width: 72%;
+  height: 24vh;
+  top: 16vh;
+  left: 14%;
+  font-size: 16vh;
+  text-align: center;
+  color: rgba(33, 37, 41, 0.5);
+}
+
+#menu-text {
+  user-select: none;
+  line-height: 24vh;
+  margin-bottom: 0;
+}
+
+#menu-button-panel {
+  position: absolute;
+  width: 100%;
+  top: 48vh;
+  left: calc((100% - 40vh) / 2);
+}
+
+#menu-button {
+  width: 40vh;
+}

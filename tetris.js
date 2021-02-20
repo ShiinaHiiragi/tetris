@@ -311,6 +311,7 @@ var Cite =
   rankingButton: document.getElementById("ranking-button"),
   pausePanel: document.getElementById("pause-panel"),
   pauseMenu: document.getElementById("pause-menu"),
+  pauseText: document.getElementById("pause-title"),
   // button: Start, Continue, Retry, Back to Menu
   spawnButton: function(self, type)
   {
@@ -797,6 +798,7 @@ System.loadSE();
 System.shuffleInit();
 Cite.rankingPanel.style.display = "none";
 Cite.pausePanel.style.display = "none";
+Cite.pauseText.innerHTML = "Pause";
 Pieces.now.init(System.shuffle[System.shufflePointer], false);
 document.oncontextmenu = function(event) { event.preventDefault(); };
 

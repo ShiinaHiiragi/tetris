@@ -58,7 +58,9 @@ var System =
   holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
   bgmList: [null, "classic.mp3", "piano.mp3", "t99.mp3",
             "t99_50.mp3", "t99_chip.mp3", "ppt_folk.mp3", "ppt_swap.mp3"],
-  seList: ["normal.mp3", "put.mp3", "hold.mp3", "erase.mp3"],
+  seList: ["normal.mp3", "put.mp3", "hold.mp3",
+           "erase.mp3", "success.mp3", "fail.mp3",
+           "count.mp3", "start.mp3", "nil.mp3"],
   infoList: [null, "Tetris", "T-Spin Mini", "T-Spin Single", "T-Spin Double", "T-Spin Triple", "Prevented: Locking Down"],
   allowChange: true,
   lastSpin: false,
@@ -66,7 +68,7 @@ var System =
   perfectClear: false,
   gameStart: false,
   bgm: null,
-  se: [null, null, null, null],
+  se: [],
   falldownClock: null,
   lockdownClock: null,
   comboClock: null,
@@ -105,9 +107,9 @@ var System =
   },
   loadSE: function()
   {
-    for (var index = 0; index < 4; index += 1)
+    for (var index = 0; index < this.seList.length; index += 1)
     {
-      this.se[index] = document.createElement("audio");
+      this.se.push(document.createElement("audio"));
       this.se[index].src = "src/se/" + this.seList[index];
       this.se[index].load();
     }
@@ -123,9 +125,11 @@ var System =
       }, delay);
     });
   },
-  gameOver: function(message)
+  gameOver: function(message, success)
   {
     if (Setting.bgm > 0) this.bgm.pause();
+    if (success) System.se[4].cloneNode().play();
+    else System.se[5].cloneNode().play();
     System.timerClock = window.clearInterval(System.timerClock);
     document.removeEventListener('keydown', Game.keyboardEvent);
     document.addEventListener('keydown', Game.lastKeyboardEvent);
@@ -189,12 +193,25 @@ var System =
   },
   countDown: async function()
   {
-    await System.asyncTimer(Setting.countDown, () => { Cite.tinfo.innerText = "3"; });
-    await System.asyncTimer(Setting.countDown, () => { Cite.tinfo.innerText = "2"; });
-    await System.asyncTimer(Setting.countDown, () => { Cite.tinfo.innerText = "1"; });
+    await System.asyncTimer(Setting.countDown, () => 
+    {
+      System.se[6].cloneNode().play();
+      Cite.tinfo.innerText = "3";
+    });
+    await System.asyncTimer(Setting.countDown, () => 
+    {
+      System.se[6].cloneNode().play();
+      Cite.tinfo.innerText = "2";
+    });
+    await System.asyncTimer(Setting.countDown, () => 
+    {
+      System.se[6].cloneNode().play();
+      Cite.tinfo.innerText = "1";
+    });
     await System.asyncTimer(Setting.countDown, () =>
     {
       initialize();
+      System.se[7].cloneNode().play();
       Cite.tinfo.innerText = "Start";
     });
     await System.asyncTimer(Setting.countDown, () =>
@@ -290,6 +307,8 @@ var System =
     else System.printInfo(6, false);
   }
 }
+System.loadSE();
+System.se[8].cloneNode().play();
 
 // Cite: the element in the HTML DOM
 var Cite =
@@ -747,7 +766,7 @@ var Game =
       Game.updatePieceNow();
       Game.chooseTimeInterval();
     }
-    else if (Pieces.now.draw(true, true, false)) System.gameOver("LOCK OUT");
+    else if (Pieces.now.draw(true, true, false)) System.gameOver("LOCK OUT", false);
     else if (Pieces.now.init(System.shuffle[++System.shufflePointer], true))
     {
       var sum = 0, ptr = 23, fullLine = new Array(), thisSpecial;
@@ -793,12 +812,11 @@ var Game =
         Game.drawSide(index, System.shuffle[System.shufflePointer + index], true);
       }
       if (System.shufflePointer == 7) System.shuffleRefresh();
-      if (Setting.sprintMode && Panel.line <= 0) System.gameOver("ACCOMPLISHED");
+      if (Setting.sprintMode && Panel.line <= 0) System.gameOver("ACCOMPLISHED", true);
     }
-    else System.gameOver("BLOCK OUT");
+    else System.gameOver("BLOCK OUT", false);
   }
 };
-System.loadSE();
 System.shuffleInit();
 Cite.rankingPanel.style.display = "none";
 Cite.pausePanel.style.display = "none";

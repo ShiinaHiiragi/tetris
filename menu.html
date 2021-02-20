@@ -55,21 +55,33 @@
       <div class="ui vertical buttons" id="menu-button">
         <button class="ui button" style="border-radius: 0;" onclick="enterTetris(1)">Sprint</button>
         <button class="ui button" style="border-radius: 0;" onclick="enterTetris(0)">Marathon</button>
-        <button class="ui button" style="border-radius: 0;" onclick="enterSetting()">Setting</button>
+        <button class="ui button" style="border-radius: 0;" onclick="location.reload()">Setting</button>
         <button class="ui button" style="border-radius: 0;" onclick="remote.app.quit()">Exit</button>
       </div>
     </div>
   </div>
 
   <script>
-    // const electron = require("electron");
-    // const remote = electron.remote;
-    // const fs = require("fs");
+    const electron = require("electron");
+    const remote = electron.remote;
+    const fs = require("fs");
     document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+    var Setting = fs.readFileSync("src/setting.json");
+    Setting = JSON.parse(Setting);
+    var titleColor = rgbToRGBA(Setting.color[Math.floor(Math.random() * 7 + 1)], 0.6);
+    document.getElementById("menu-text").style.color = titleColor;
 
     function enterTetris(mode)
     {
       document.location.href = "tetris.html";
+    }
+
+    function rgbToRGBA(rgb, opacity)
+    {
+      var rgbArray = rgb.match(/-?([1-9]\d*(\.\d*)*|0\.[1-9]\d*)/g);
+      for (var index= 0; index < rgbArray.length; index += 1)
+        rgbArray[index] = Number(rgbArray[index]);
+      return `rgba(${rgbArray[0]}, ${rgbArray[1]}, ${rgbArray[2]}, ${opacity})`;
     }
   </script>
 </body>

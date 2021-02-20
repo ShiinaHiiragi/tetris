@@ -13,13 +13,44 @@
 
   <!-- Customized Resources -->
   <link rel="stylesheet" type="text/css" href="tetris.css">
+  <style>
+    .menu-title-field {
+      position: absolute;
+      height: 18vh;
+      top: 16vh;
+      font-size: 18vh;
+      text-align: center;
+      margin: auto;
+    }
+
+    #menu-title {
+      float: left;
+      line-height: 18vh;
+      margin-bottom: 0;
+    }
+
+    #menu-buttons-panel {
+      position: absolute;
+      width: 32vh;
+      top: 40vh;
+      left: calc((100% - 32vh) / 2);
+    }
+  </style>
 </head>
 
 <body>
-  <!--TODO: add href to button-->
   <div class="overlay"></div>
-  <div class="panel">
-    
+  <div class="panel" id="panel">
+    <div class="menu-title-field" id="menu-title-field">
+      <p id="menu-title">TETRIS</p>
+    </div>
+    <div class="ui container" id="menu-buttons-panel">
+      <div class="ui vertical buttons" id="menu-buttons">
+        <button class="ui button" id="pause-1" onclick="document.location.href='tetris.html'">Start</button>
+        <button class="ui button" id="pause-2" onclick="">Setting</button>
+        <button class="ui button" id="pause-3" onclick="">Exit</button>
+      </div>
+    </div>
   </div>
 
   <script type="text/javascript" src="menu.js"></script>

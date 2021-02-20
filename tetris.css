@@ -184,7 +184,8 @@
   width: 40vw;
   min-width: 80vh;
   z-index: 5;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(33, 37, 41, 0.5);
+  color: rgb(255, 255, 255);
   text-align: center;
   user-select: none;
   padding-top: 6vh;
@@ -215,7 +216,8 @@
   width: 40vw;
   min-width: 80vh;
   z-index: 5;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(33, 37, 41, 0.5);
+  color: rgb(255, 255, 255);
   text-align: center;
   user-select: none;
   padding-top: 16vh;

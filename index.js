@@ -17,7 +17,7 @@ function createWindow()
   ({
     transparent: false,
     show: false,
-    webPreferences: { nodeIntegration: true }
+    webPreferences: {nodeIntegration: true, enableRemoteModule: true}
   })
 
   // and load the index.html of the app.

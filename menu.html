@@ -73,6 +73,8 @@
 
     function enterTetris(mode)
     {
+      Setting.mode = mode;
+      fs.writeFileSync("src/setting.json", JSON.stringify(Setting));
       document.location.href = "tetris.html";
     }
 

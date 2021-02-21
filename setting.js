@@ -6,13 +6,18 @@ var panel = document.getElementById("panel");
 var optionBGM = document.getElementById("option-bgm");
 var optionColor = document.getElementById("option-color");
 var optionDebug = document.getElementById("option-debug");
-var sprintLine = document.getElementById("sprint-line");
-var countDown = document.getElementById("countdown-time");
-var infoTime = document.getElementById("info-time");
-var fallTime = document.getElementById("fall-time");
-var lockTime = document.getElementById("lock-time");
 var optionTetColor = document.getElementById("option-tet-color");
+var optionGeneral = document.getElementById("option-general");
+var generalRawString = ["sprint-line", "count-down", "info-time", "fall-time", "lock-time"];
 var generalString = ["sprintLine", "countDown", "infoTime", "fallTime", "lockTime"];
+var generalLeft =
+[
+  "<a title=\"Lines to erase in Sprint mode.\">Sprint Line</a>",
+  "<a title=\"Time span between three, two and one.\">Countdown (ms)</a>",
+  "<a title=\"Time span of information like Tetris or T-Spin.\">Info Time (ms)</a>",
+  "<a title=\"Time span of tetromino falling down.\">Fall Time (ms)</a>",
+  "<a title=\"Time span before tetromino locking down.\">Lock Time (ms)</a>"
+];
 var tetString = ["O", "L", "J", "T", "S", "Z", "I"];
 var Setting =
 {
@@ -40,9 +45,9 @@ var Setting =
     softDrop: 40
   },
   bgm: 3,
-  randomColor: true,
-  sprintMode: true,
-  debugMode: true,
+  randomColor: false,
+  sprintMode: false,
+  debugMode: false,
   sprintLine: 40,
   countDown: 500,
   infoTime: 1000,
@@ -62,7 +67,28 @@ optionColorButton.setAttribute("onclick", "switchPressed(this)");
 optionDebugButton.setAttribute("onclick", "switchPressed(this)");
 optionColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
-generalString.forEach((item) => { eval(`${item}.children[0].value = Setting.${item};`); });
+for (var index = 0; index < 5; index += 1)
+{
+  var newOptionBox = document.createElement("div");
+  newOptionBox.className = "option-box";
+  optionGeneral.append(newOptionBox);
+  var newOptionLeft = document.createElement("div");
+  var newOptionRight = document.createElement("div");
+  newOptionLeft.className = "option-left";
+  newOptionRight.className = "option-right";
+  newOptionLeft.innerHTML = generalLeft[index];
+  newOptionBox.append(newOptionLeft);
+  newOptionBox.append(newOptionRight);
+  var newUIInput = document.createElement("div");
+  newUIInput.className = "ui input";
+  newUIInput.id = generalRawString[index];
+  newOptionRight.append(newUIInput);
+  var newInput = document.createElement("input");
+  newInput.type = "text";
+  eval(`newInput.value = Setting.${generalString[index]}`);
+  newUIInput.append(newInput);
+}
+
 tetString.forEach((item, index) =>
 {
   var newOptionBox = document.createElement("div");
@@ -97,17 +123,20 @@ tetString.forEach((item, index) =>
 
 function collectNewSetting()
 {
-  Setting.bgm = Number(optionBGM.children[0].defaultValue);
+  if (Number(optionBGM.children[0].defaultValue) != NaN)
+    Setting.bgm = Number(optionBGM.children[0].defaultValue);
   Setting.randomColor = (optionColorButton.className == "ui basic button active");
   Setting.debugMode = (optionDebugButton.className == "ui basic button active");
-  generalString.forEach((item) => { eval(`if (Number(${item}.children[0].value) != NaN)
-    Setting.${item} = Number(${item}.children[0].value);`); });
+  for (var index = 0; index < 5; index += 1)
+  {
+    var num = Number(document.getElementById(generalRawString[index]).children[0].value);
+    if (num != NaN) eval(`Setting.${generalString[index]} = num`);
+  }
   for (var index = 0; index < 7; index += 1)
   {
     var rgbArray = Setting.color[index + 1].match(/-?([1-9]\d*(\.\d*)*|0\.[1-9]\d*)/g);
     for (var subIndex = 0; subIndex < 3; subIndex += 1)
     {
-      console.log(document.getElementById(`${tetString[index]}-${subIndex}`).children[0].value);
       var num = Number(document.getElementById(`${tetString[index]}-${subIndex}`).children[0].value);
       if (num != NaN) rgbArray[subIndex] = num;
     }

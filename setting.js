@@ -6,6 +6,7 @@ var panel = document.getElementById("panel");
 var optionBGM = document.getElementById("option-bgm");
 var optionColor = document.getElementById("option-color");
 var optionDebug = document.getElementById("option-debug");
+var optionSprint = document.getElementById("sprint-line");
 var Setting =
 {
   color:
@@ -54,14 +55,18 @@ optionColorButton.setAttribute("onclick", "switchPressed(this)");
 optionDebugButton.setAttribute("onclick", "switchPressed(this)");
 optionColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
+optionSprint.children[0].value = Setting.sprintLine;
 
 function collectNewSetting()
 {
   Setting.bgm = Number(optionBGM.children[0].defaultValue);
   Setting.randomColor = (optionColorButton.className == "ui basic button active");
   Setting.debugMode = (optionDebugButton.className == "ui basic button active");
+  if (Number(optionSprint.children[0].value) != NaN)
+    Setting.sprintLine = Number(optionSprint.children[0].value);
   console.log(Setting);
 }
+
 function switchPressed(self)
 {
   var trueValue = (self.className == "ui basic button active");

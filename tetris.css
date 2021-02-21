@@ -390,6 +390,7 @@
   max-height: 6vh !important;
   border-radius: 0;
   background-color: transparent !important;
+  margin-right: 0;
 }
 
 #option-debug .ui.basic.button {
@@ -398,6 +399,7 @@
   max-height: 6vh !important;
   border-radius: 0;
   background-color: transparent !important;
+  margin-right: 0;
 }
 
 #option-apply {
@@ -413,4 +415,27 @@
   margin-left: calc((100% - 24vh) / 2);
   border-radius: 0;
   background-color: transparent !important;
+}
+
+.ui.input {
+  float: right;
+  width: 12vh;
+}
+
+.ui.input input {
+  border-radius: 0;
+  background-color: transparent;
+  text-align: center;
+}
+
+.ui.input input:active {
+  border-width: 1.4px;
+  border-color: rgba(128, 128, 128, 0.5);
+  background-color: transparent;
+}
+
+.ui.input input:focus {
+  border-width: 1.4px;
+  border-color: rgba(128, 128, 128, 0.5);
+  background-color: transparent;
 }

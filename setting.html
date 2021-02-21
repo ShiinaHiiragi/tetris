@@ -47,15 +47,25 @@
             </div>
           </div>
         </div>
-
         <div class="option-box">
-          <div class="option-left">Random Color</div>
+          <div class="option-left"><a title="The title will be colored randomly if selected.">Random Color</a></div>
           <div class="option-right">
-            <div class="ui container" id="option-switch" name="randomColor">
-              <button class="ui basic button">OFF</button>
-            </div>
+            <div class="ui container" id="option-color"></div>
           </div>
         </div>
+        <div class="option-box">
+          <div class="option-left"><a title="Used to reproduce errors.">Debug Mode</a></div>
+          <div class="option-right">
+            <div class="ui container" id="option-debug"></div>
+          </div>
+        </div>
+      </div>
+      <div class="option-group-label">Keyboard</div>
+      <div class="option-group" style="height:40vh;"></div>
+      <div class="option-group-label">Color</div>
+      <div class="option-group" style="height:40vh;"></div>
+      <div class="ui container" id="option-apply">
+        <button class="ui basic button" onclick="collectNewSetting()">Apply</button>
       </div>
     </div>
   </div>

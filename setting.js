@@ -4,6 +4,8 @@
 document.body.style.backgroundImage = "url('src/img/bg.jpg')";
 var panel = document.getElementById("panel");
 var optionBGM = document.getElementById("option-bgm");
+var optionColor = document.getElementById("option-color");
+var optionDebug = document.getElementById("option-debug");
 var Setting =
 {
   color:
@@ -30,9 +32,9 @@ var Setting =
     softDrop: 40
   },
   bgm: 3,
-  randomColor: false,
-  sprintMode: false,
-  debugMode: false,
+  randomColor: true,
+  sprintMode: true,
+  debugMode: true,
   sprintLine: 40,
   countDown: 500,
   infoTime: 1000,
@@ -42,11 +44,29 @@ var Setting =
 
 panel.style.border = "1.6px solid white";
 optionBGM.children[0].defaultValue = Setting.bgm;
-
+var optionColorButton = document.createElement("button");
+var optionDebugButton = document.createElement("button");
+optionColorButton.className = (Setting.randomColor ? "ui basic button active" : "ui basic button");
+optionDebugButton.className = (Setting.debugMode ? "ui basic button active" : "ui basic button");
+optionColorButton.innerText = (Setting.randomColor ? "ON" : "OFF");
+optionDebugButton.innerText = (Setting.debugMode ? "ON" : "OFF");
+optionColorButton.setAttribute("onclick", "switchPressed(this)");
+optionDebugButton.setAttribute("onclick", "switchPressed(this)");
+optionColor.append(optionColorButton);
+optionDebug.append(optionDebugButton);
 
 function collectNewSetting()
 {
   Setting.bgm = Number(optionBGM.children[0].defaultValue);
+  Setting.randomColor = (optionColorButton.className == "ui basic button active");
+  Setting.debugMode = (optionDebugButton.className == "ui basic button active");
   console.log(Setting);
 }
+function switchPressed(self)
+{
+  var trueValue = (self.className == "ui basic button active");
+  self.className = (trueValue ? "ui basic button" : "ui basic button active");
+  self.innerText = (trueValue ? "OFF" : "ON");
+}
+
 $(".ui.dropdown").dropdown();

@@ -234,15 +234,15 @@
 }
 
 #pause-menu .ui.button:hover {
-  background-color: rgba(225, 225, 225, 0.5)!important;
+  background-color: rgba(225, 225, 225, 0.5) !important;
 }
 
 #ranking-button .ui.button:hover {
-  background-color: rgba(225, 225, 225, 0.5)!important;
+  background-color: rgba(225, 225, 225, 0.5) !important;
 }
 
 #debug-button .ui.button {
-  background-color: rgba(255, 255, 255, 0.25)!important;
+  background-color: rgba(255, 255, 255, 0.25) !important;
   border: 1.6px solid rgb(255, 255, 255);
   border-top-width: 0;
   width: 20vw;
@@ -250,7 +250,7 @@
 }
 
 #debug-button .ui.button:hover {
-  background-color: rgba(225, 225, 225, 0.5)!important;
+  background-color: rgba(225, 225, 225, 0.5) !important;
 }
 
 .menu-title {
@@ -282,7 +282,7 @@
 }
 
 #menu-button .ui.basic.button:hover {
-  background-color: rgba(128, 128, 128, 0.5)!important;
+  background-color: rgba(128, 128, 128, 0.5) !important;
 }
 
 .option-title {
@@ -335,10 +335,9 @@
 
 .option-group-label {
   width: 84%;
-  height: 5.2vh;
+  height: 6vh;
   font-size: 2.6vh;
-  display: table-cell;
-  vertical-align: bottom;
+  padding-top: 2vh;
 }
 
 .option-box {
@@ -356,10 +355,8 @@
   line-height: 6vh;
 }
 
-.option-down {
-  width: 40%;
-  font-size: 1.8vh;
-  padding-left: 2.4vh;
+.option-left>a {
+  color: black;
 }
 
 .option-right {
@@ -373,7 +370,7 @@
   float: right;
   border-radius: 0;
   border: 0;
-  max-height: 6vh!important;
+  max-height: 6vh !important;
   background-color: transparent;
 }
 
@@ -387,11 +384,33 @@
   border: 0;
 }
 
-#option-switch .ui.button {
+#option-color .ui.basic.button {
   float: right;
-}
-
-#option-switch .ui.button {
+  width: 12vh; 
   max-height: 6vh !important;
   border-radius: 0;
+  background-color: transparent !important;
+}
+
+#option-debug .ui.basic.button {
+  float: right;
+  width: 12vh; 
+  max-height: 6vh !important;
+  border-radius: 0;
+  background-color: transparent !important;
+}
+
+#option-apply {
+  width: 84% !important;
+  margin: 0 !important;
+  padding-top: 4vh;
+  padding-bottom: 4vh;
+}
+
+#option-apply .ui.basic.button {
+  width: 24vh; 
+  max-height: 6vh !important;
+  margin-left: calc((100% - 24vh) / 2);
+  border-radius: 0;
+  background-color: transparent !important;
 }

@@ -376,6 +376,8 @@ var eachOne = [2, 3, 4];
 [1, 4].forEach((type) => { Cite.spawnButton(Cite.debugButton, type); });
 eachOne.forEach((type) => { Cite.spawnButton(Cite.pauseMenu, type); });
 [3, 4].forEach((type) => { Cite.spawnButton(Cite.rankingButton, type); });
+Cite.debugButton.childNodes[0].style.borderRightWidth = "0.8px";
+Cite.debugButton.childNodes[1].style.borderLeftWidth = "0.8px";
 // process the raw element in the DOM
 for (var index = 0; index < 20; index += 1)
   for (var subIndex = 0; subIndex < 10; subIndex += 1)

@@ -23,7 +23,7 @@
   "bgm": 3,
   "randomColor": false,
   "sprintMode": false,
-  "debugMode": true,
+  "debugMode": false,
   "sprintLine": 40,
   "countDown": 500,
   "infoTime": 1000,

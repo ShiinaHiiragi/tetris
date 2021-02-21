@@ -37,6 +37,7 @@ function addButton(div, text, func)
   var newButton = document.createElement("button");
   newButton.className = "ui button";
   newButton.style.borderRadius = "0";
+  newButton.style.maxHeight = "6vh";
   newButton.setAttribute("onclick", func);
   newButton.innerText = text;
   div.append(newButton);

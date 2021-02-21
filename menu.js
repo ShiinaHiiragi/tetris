@@ -19,8 +19,11 @@ addButton(menuButton, "Sprint", "enterTetris(true)");
 addButton(menuButton, "Marathon", "enterTetris(false)");
 addButton(menuButton, "Setting", "document.location.href = 'setting.html'");
 addButton(menuButton, "Exit", "remote.app.quit()");
-nilSE.src = "src/se/nil.mp3", buttonHover.src = "src/se/normal.mp3";;
-nilSE.load(), buttonHover.load(), nilSE.cloneNode().play();
+nilSE.src = "src/se/nil.mp3";
+buttonHover.src = "src/se/hover.mp3";
+buttonHover.volume = 0.2;
+nilSE.load(), buttonHover.load();
+nilSE.cloneNode().play();
 
 function enterTetris(mode)
 {

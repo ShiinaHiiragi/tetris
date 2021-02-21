@@ -60,7 +60,8 @@ var System =
             "t99_50.mp3", "t99_chip.mp3", "ppt_folk.mp3", "ppt_swap.mp3"],
   seList: ["normal.mp3", "put.mp3", "hold.mp3",
            "erase.mp3", "success.mp3", "fail.mp3",
-           "count.mp3", "start.mp3", "nil.mp3"],
+           "count.mp3", "start.mp3", "nil.mp3",
+           "hover.mp3", "special.mp3"],
   infoList: [null, "Tetris", "T-Spin Mini", "T-Spin Single", "T-Spin Double", "T-Spin Triple", "Prevented: Locking Down"],
   allowChange: true,
   lastSpin: false,
@@ -336,8 +337,10 @@ var Cite =
   spawnButton: function(self, type)
   {
     var newButton = document.createElement("button");
-    newButton.className = "ui button";
+    newButton.className = "ui basic button";
     newButton.style.borderRadius = "0";
+    newButton.style.fontSize = "2.4vh";
+    newButton.style.setProperty("color", "rgba(255, 255, 255, 0.8)", "important");
     switch (type)
     {
       case 1:
@@ -780,18 +783,16 @@ var Game =
       {
         Panel.combo += 1;
         if (Panel.combo > 1) System.printCombo();
-        System.se[3].cloneNode().play();
         if (Setting.sprintMode) Panel.line -= fullLine.length;
         else Panel.line += fullLine.length;
         Cite.line.innerText = Panel.line.toString();
       }
-      else
-      {
-        Panel.combo = 0;
-        System.se[1].cloneNode().play();
-      }
+      else Panel.combo = 0;
       if (System.perfectClear) System.printPerfect();
       thisSpecial = System.specialJudge(fullLine.length);
+      if (fullLine.length && thisSpecial) System.se[10].cloneNode().play();
+      else if (fullLine.length) System.se[3].cloneNode().play();
+      else System.se[1].cloneNode().play();
       if (thisSpecial) System.printInfo(thisSpecial, System.lastSpecial);
       Panel.score += System.countScore(fullLine.length, thisSpecial);
       Cite.score.innerText = Panel.score.toString();
@@ -849,3 +850,11 @@ function initialize()
   System.timerClock = window.setInterval(System.refreshTimer, 1000); 
   document.addEventListener('keydown', Game.keyboardEvent);
 }
+
+// jQuery: add button hover SE
+$(document).ready(function()
+{
+  $("button.ui.basic.button").mouseover(function() {
+    System.se[9].cloneNode().play();
+  });
+});

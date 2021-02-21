@@ -233,6 +233,22 @@
   width: 36vh;
 }
 
+#pause-menu .ui.button:hover {
+  background-color: rgba(225, 225, 225, 0.5)!important;
+}
+
+#ranking-button .ui.button:hover {
+  background-color: rgba(225, 225, 225, 0.5)!important;
+}
+
+#debug-button .ui.button {
+  background-color: rgba(255, 255, 255, 0)!important;
+}
+
+#debug-button .ui.button:hover {
+  background-color: rgba(225, 225, 225, 0.5)!important;
+}
+
 .menu-title {
   position: absolute;
   width: 72%;

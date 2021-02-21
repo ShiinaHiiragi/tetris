@@ -261,7 +261,7 @@
   width: 40vh;
 }
 
-.ui.basic.button:hover {
+#menu-button .ui.basic.button:hover {
   background-color: rgba(128, 128, 128, 0.5)!important;
 }
 

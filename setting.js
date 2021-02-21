@@ -6,7 +6,12 @@ var panel = document.getElementById("panel");
 var optionBGM = document.getElementById("option-bgm");
 var optionColor = document.getElementById("option-color");
 var optionDebug = document.getElementById("option-debug");
-var optionSprint = document.getElementById("sprint-line");
+var sprintLine = document.getElementById("sprint-line");
+var countDown = document.getElementById("countdown-time");
+var infoTime = document.getElementById("info-time");
+var fallTime = document.getElementById("fall-time");
+var lockTime = document.getElementById("lock-time");
+var generalString = ["sprintLine", "countDown", "infoTime", "fallTime", "lockTime"];
 var Setting =
 {
   color:
@@ -55,15 +60,15 @@ optionColorButton.setAttribute("onclick", "switchPressed(this)");
 optionDebugButton.setAttribute("onclick", "switchPressed(this)");
 optionColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
-optionSprint.children[0].value = Setting.sprintLine;
+generalString.forEach((item) => { eval(`${item}.children[0].value = Setting.${item};`); });
 
 function collectNewSetting()
 {
   Setting.bgm = Number(optionBGM.children[0].defaultValue);
   Setting.randomColor = (optionColorButton.className == "ui basic button active");
   Setting.debugMode = (optionDebugButton.className == "ui basic button active");
-  if (Number(optionSprint.children[0].value) != NaN)
-    Setting.sprintLine = Number(optionSprint.children[0].value);
+  generalString.forEach((item) => { eval(`if (Number(${item}.children[0].value) != NaN)
+    Setting.${item} = Number(${item}.children[0].value);`); });
   console.log(Setting);
 }
 

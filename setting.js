@@ -2,6 +2,7 @@
 // const fs = require("fs");
 
 document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundSize = "cover";
 var panel = document.getElementById("panel");
 var optionBGM = document.getElementById("option-bgm");
 var optionColor = document.getElementById("option-color");

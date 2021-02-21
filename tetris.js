@@ -368,6 +368,7 @@ var Cite =
   sides: new Array(7)
 }
 document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundSize = "cover";
 for (var index = 0; index < 20; index += 1)
   Cite.cells[index] = new Array(10).fill(null);
 for (var index = 0; index < 7; index += 1)

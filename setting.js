@@ -82,13 +82,12 @@ tetString.forEach((item, index) =>
   newUIContainer.id = `option-${item}`;
   newOptionRight.append(newUIContainer);
   var rgbArray = Setting.color[index + 1].match(/-?([1-9]\d*(\.\d*)*|0\.[1-9]\d*)/g);
-  var rgb = ["B, G, R"];
   for (var index = 2; index >= 0; index -= 1)
   {
     var newUIInput = document.createElement("div");
     var newInput = document.createElement("input");
     newUIInput.className = "ui input";
-    newUIInput.id = `${item}-${rgb[index]}`;
+    newUIInput.id = `${item}-${index}`;
     newInput.type = "text";
     newInput.value = rgbArray[index];
     newUIContainer.append(newUIInput);
@@ -103,6 +102,17 @@ function collectNewSetting()
   Setting.debugMode = (optionDebugButton.className == "ui basic button active");
   generalString.forEach((item) => { eval(`if (Number(${item}.children[0].value) != NaN)
     Setting.${item} = Number(${item}.children[0].value);`); });
+  for (var index = 0; index < 7; index += 1)
+  {
+    var rgbArray = Setting.color[index + 1].match(/-?([1-9]\d*(\.\d*)*|0\.[1-9]\d*)/g);
+    for (var subIndex = 0; subIndex < 3; subIndex += 1)
+    {
+      console.log(document.getElementById(`${tetString[index]}-${subIndex}`).children[0].value);
+      var num = Number(document.getElementById(`${tetString[index]}-${subIndex}`).children[0].value);
+      if (num != NaN) rgbArray[subIndex] = num;
+    }
+    Setting.color[index + 1] = `rgb(${rgbArray[0]}, ${rgbArray[1]}, ${rgbArray[2]})`;
+  }
   console.log(Setting);
 }
 

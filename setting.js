@@ -11,7 +11,9 @@ var countDown = document.getElementById("countdown-time");
 var infoTime = document.getElementById("info-time");
 var fallTime = document.getElementById("fall-time");
 var lockTime = document.getElementById("lock-time");
+var optionTetColor = document.getElementById("option-tet-color");
 var generalString = ["sprintLine", "countDown", "infoTime", "fallTime", "lockTime"];
+var tetString = ["O", "L", "J", "T", "S", "Z", "I"];
 var Setting =
 {
   color:
@@ -61,6 +63,38 @@ optionDebugButton.setAttribute("onclick", "switchPressed(this)");
 optionColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
 generalString.forEach((item) => { eval(`${item}.children[0].value = Setting.${item};`); });
+tetString.forEach((item, index) =>
+{
+  var newOptionBox = document.createElement("div");
+  newOptionBox.className = "option-box";
+  optionTetColor.append(newOptionBox);
+  var newOptionLeft = document.createElement("div");
+  var newOptionRight = document.createElement("div");
+  newOptionLeft.className = "option-left";
+  newOptionRight.className = "option-right";
+  newOptionLeft.style.width = "30%";
+  newOptionRight.style.width = "70%";
+  newOptionLeft.innerText = `${item} Tetromino`;
+  newOptionBox.append(newOptionLeft);
+  newOptionBox.append(newOptionRight);
+  var newUIContainer = document.createElement("div");
+  newUIContainer.className = "ui container";
+  newUIContainer.id = `option-${item}`;
+  newOptionRight.append(newUIContainer);
+  var rgbArray = Setting.color[index + 1].match(/-?([1-9]\d*(\.\d*)*|0\.[1-9]\d*)/g);
+  var rgb = ["B, G, R"];
+  for (var index = 2; index >= 0; index -= 1)
+  {
+    var newUIInput = document.createElement("div");
+    var newInput = document.createElement("input");
+    newUIInput.className = "ui input";
+    newUIInput.id = `${item}-${rgb[index]}`;
+    newInput.type = "text";
+    newInput.value = rgbArray[index];
+    newUIContainer.append(newUIInput);
+    newUIInput.append(newInput);
+  }
+})
 
 function collectNewSetting()
 {

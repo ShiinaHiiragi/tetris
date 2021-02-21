@@ -4,6 +4,7 @@ const remote = electron.remote;
 const fs = require("fs");
 var Setting = JSON.parse(fs.readFileSync("src/code/setting.json"));
 var titleColor = rgbToRGBA(Setting.color[Math.floor(Math.random() * 7 + 1)], 0.6);
+var panel = document.getElementById("panel");
 var menuButton = document.getElementById("menu-button");
 var menuText = document.getElementById("menu-text");
 var nilSE = document.createElement("audio");
@@ -11,7 +12,7 @@ var buttonHover = document.createElement("audio");
 
 document.body.style.backgroundImage = "url('src/img/bg.jpg')";
 document.body.style.backgroundSize = "cover";
-
+panel.style.border = "1.6px solid white";
 menuText.innerText = "TETRIS";
 if (Setting.randomColor) menuText.style.color = titleColor;
 else menuText.style.color = "rgba(0, 0, 0, 0.6)";

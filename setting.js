@@ -8,6 +8,7 @@ var optionColor = document.getElementById("option-color");
 var optionDebug = document.getElementById("option-debug");
 var optionTetColor = document.getElementById("option-tet-color");
 var optionGeneral = document.getElementById("option-general");
+var optionApply = document.getElementById("option-apply");
 var generalRawString = ["sprint-line", "count-down", "info-time", "fall-time", "lock-time"];
 var generalString = ["sprintLine", "countDown", "infoTime", "fallTime", "lockTime"];
 var generalLeft =
@@ -59,6 +60,10 @@ panel.style.border = "1.6px solid white";
 optionBGM.children[0].defaultValue = Setting.bgm;
 var optionColorButton = document.createElement("button");
 var optionDebugButton = document.createElement("button");
+var applyButton = document.createElement("button");
+applyButton.className = "ui basic button";
+applyButton.innerText = "Apply";
+applyButton.setAttribute("onclick", "collectNewSetting()");
 optionColorButton.className = (Setting.randomColor ? "ui basic button active" : "ui basic button");
 optionDebugButton.className = (Setting.debugMode ? "ui basic button active" : "ui basic button");
 optionColorButton.innerText = (Setting.randomColor ? "ON" : "OFF");
@@ -67,6 +72,8 @@ optionColorButton.setAttribute("onclick", "switchPressed(this)");
 optionDebugButton.setAttribute("onclick", "switchPressed(this)");
 optionColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
+optionApply.append(applyButton);
+
 for (var index = 0; index < 5; index += 1)
 {
   var newOptionBox = document.createElement("div");

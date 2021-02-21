@@ -25,9 +25,37 @@
       <div id="option-back"><a href="menu.html">×</a></div>
     </div>
     <div class="option-frame">
-      <label>General</label>
+      <div class="option-group-label">General</div>
       <div class="option-group">
-        <div class="option-box"></div>
+        <div class="option-box">
+          <div class="option-left">Game BGM</div>
+          <div class="option-right">
+            <div class="ui selection dropdown" id="option-bgm">
+              <input type="hidden">
+              <i class="dropdown icon"></i>
+              <div class="text"></div>
+              <div class="menu transition hidden">
+                <div class="item" data-value="0">Forbidden</div>
+                <div class="item" data-value="1">Classic</div>
+                <div class="item" data-value="2">Piano Version</div>
+                <div class="item" data-value="3">Tetris 99 Battle 1</div>
+                <div class="item" data-value="4">Tetris 99 Battle 2</div>
+                <div class="item" data-value="5">Tetris 99 Chiptune</div>
+                <div class="item" data-value="6">Puyopuyo Tetris Folktales</div>
+                <div class="item" data-value="7">Puyopuyo Tetris Swap</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="option-box">
+          <div class="option-left">Random Color</div>
+          <div class="option-right">
+            <div class="ui container" id="option-switch" name="randomColor">
+              <button class="ui basic button">OFF</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

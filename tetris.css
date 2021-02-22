@@ -384,16 +384,7 @@
   border: 0;
 }
 
-#option-color .ui.basic.button {
-  float: right;
-  width: 12vh; 
-  max-height: 6vh !important;
-  border-radius: 0;
-  background-color: transparent !important;
-  margin-right: 0;
-}
-
-#option-debug .ui.basic.button {
+.option-right .ui.container .ui.basic.button {
   float: right;
   width: 12vh; 
   max-height: 6vh !important;

@@ -1,15 +1,18 @@
 // menu.js: JavaScript and Node.JS enviornment
 // const fs = require("fs");
 
+// process by each
 var panel = document.getElementById("panel");
+var optionRandomColor = document.getElementById("option-color");
+var optionDebug = document.getElementById("option-debug");
+var optionApply = document.getElementById("option-apply");
 var optionTitle = document.getElementById("option-title");
+var optionBGM = document.getElementById("option-bgm");
+var optionBG = document.getElementById("option-bg");
+// process by all
 var optionGeneral = document.getElementById("option-general");
 var optionKey = document.getElementById("option-key");
 var optionColor = document.getElementById("option-tet-color");
-var optionApply = document.getElementById("option-apply");
-var optionBGM = document.getElementById("option-bgm");
-var optionRandomColor = document.getElementById("option-color");
-var optionDebug = document.getElementById("option-debug");
 var tetString = ["O", "L", "J", "T", "S", "Z", "I"];
 var keyRawString = ["Left Shift", "Right Shift", "Hold",
                     "<i class='undo icon'></i>180°", "<i class='redo icon'></i>180°", 
@@ -66,30 +69,36 @@ var Setting =
   lockTime: 500
 }
 
-document.body.style.backgroundImage = "url('src/img/bg.jpg')";
-document.body.style.backgroundSize = "cover";
-panel.style.border = "1.6px solid white";
-optionBGM.children[0].defaultValue = Setting.bgm;
-
 var optionBack = document.createElement("div");
 var optionColorButton = document.createElement("button");
 var optionDebugButton = document.createElement("button");
 var applyButton = document.createElement("button");
+var bgButton = document.createElement("button");
 optionColorButton.className = (Setting.randomColor ? "ui basic button active" : "ui basic button");
 optionDebugButton.className = (Setting.debugMode ? "ui basic button active" : "ui basic button");
 applyButton.className = "ui basic button";
+bgButton.className = "ui basic button";
 optionBack.id = "option-back";
 optionBack.innerHTML = "<a href=\"menu.html\">×</a>";
 optionColorButton.innerText = (Setting.randomColor ? "ON" : "OFF");
 optionDebugButton.innerText = (Setting.debugMode ? "ON" : "OFF");
 applyButton.innerText = "Apply";
+bgButton.innerText = "Change...";
 optionColorButton.setAttribute("onclick", "switchPressed(this)");
 optionDebugButton.setAttribute("onclick", "switchPressed(this)");
 applyButton.setAttribute("onclick", "collectNewSetting()");
+bgButton.setAttribute("onclick", "changeBG()");
 optionRandomColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
 optionApply.append(applyButton);
+optionBG.append(bgButton);
 optionTitle.append(optionBack);
+
+document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundSize = "cover";
+panel.style.border = "1.6px solid white";
+optionBGM.children[0].defaultValue = Setting.bgm;
+bgButton.style.width = "18vh";
 
 for (var index = 0; index < 5; index += 1)
 {
@@ -200,6 +209,10 @@ function switchPressed(self)
 }
 
 function changeKey(self)
+{
+}
+
+function changeBG()
 {
 }
 

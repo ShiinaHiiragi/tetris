@@ -824,7 +824,6 @@ var Game =
   }
 };
 System.shuffleInit();
-Cite.rankingPanel.style.display = "none";
 Cite.pausePanel.style.display = "none";
 Cite.pauseText.innerHTML = "Pause";
 if (Setting.sprintMode)

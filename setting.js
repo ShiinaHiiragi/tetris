@@ -1,8 +1,20 @@
 // menu.js: JavaScript and Node.JS enviornment
-// const fs = require("fs");
-// const path = require("path");
-// const electron = require("electron");
-// const dialog = electron.remote.dialog;
+const fs = require("fs");
+const path = require("path");
+const electron = require("electron");
+const dialog = electron.remote.dialog;
+
+// other variables
+var nowWait;
+var nilSE = document.createElement("audio");
+var buttonHover = document.createElement("audio");
+var buttonClick = document.createElement("audio");
+nilSE.src = "src/se/nil.mp3";
+buttonHover.src = "src/se/hover.mp3";
+buttonClick.src = "src/se/click.mp3";
+buttonHover.volume = 0.2, buttonClick.volume = 0.2;
+nilSE.load(), buttonHover.load(), buttonClick.load();
+nilSE.cloneNode().play();
 
 // process by each
 var panel = document.getElementById("panel");
@@ -13,7 +25,6 @@ var optionTitle = document.getElementById("option-title");
 var optionBGM = document.getElementById("option-bgm");
 var optionBG = document.getElementById("option-bg");
 var waitPanel = document.getElementById("wait-panel");
-var nowWait;
 // process by all
 var optionGeneral = document.getElementById("option-general");
 var optionKey = document.getElementById("option-key");
@@ -216,6 +227,7 @@ function switchPressed(self)
 function changeKey(self)
 {
   nowWait = self;
+  buttonClick.cloneNode().play();
   waitPanel.style.display = "block";
   document.addEventListener("keydown", decideKey);
 }
@@ -258,3 +270,12 @@ function changeBG()
 }
 
 $(".ui.dropdown").dropdown();
+$(document).ready(function()
+{
+  $("button.ui.basic.button").mouseover(function() {
+    buttonHover.cloneNode().play();
+  });
+  $("div.ui.selection.dropdown").mouseover(function() {
+    buttonHover.cloneNode().play();
+  });
+});

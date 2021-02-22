@@ -4,11 +4,6 @@ const fs = require("fs");
 // Setting: data that can be changed by user
 var Setting = fs.readFileSync("src/code/setting.json");
 Setting = JSON.parse(Setting);
-// TODO: process raw setting in the file
-// fallTime: 1 ~ 10; 1: 100ms, 10: 10ms
-// lockTime: 1 ~ 10; 1: 1000ms, 10: 100ms
-// Setting.fallTime = 110 - Setting.fallTime * 10;
-// Setting.lockTime = 1100 - Setting.lockTime * 100;
 
 // System: important logic data, which cannot be changed by user
 var System =

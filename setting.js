@@ -1,9 +1,8 @@
 // menu.js: JavaScript and Node.JS enviornment
 // const fs = require("fs");
 
-document.body.style.backgroundImage = "url('src/img/bg.jpg')";
-document.body.style.backgroundSize = "cover";
 var panel = document.getElementById("panel");
+var optionTitle = document.getElementById("option-title");
 var optionGeneral = document.getElementById("option-general");
 var optionKey = document.getElementById("option-key");
 var optionColor = document.getElementById("option-tet-color");
@@ -67,23 +66,30 @@ var Setting =
   lockTime: 500
 }
 
+document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundSize = "cover";
 panel.style.border = "1.6px solid white";
 optionBGM.children[0].defaultValue = Setting.bgm;
+
+var optionBack = document.createElement("div");
 var optionColorButton = document.createElement("button");
 var optionDebugButton = document.createElement("button");
 var applyButton = document.createElement("button");
-applyButton.className = "ui basic button";
-applyButton.innerText = "Apply";
-applyButton.setAttribute("onclick", "collectNewSetting()");
 optionColorButton.className = (Setting.randomColor ? "ui basic button active" : "ui basic button");
 optionDebugButton.className = (Setting.debugMode ? "ui basic button active" : "ui basic button");
+applyButton.className = "ui basic button";
+optionBack.id = "option-back";
+optionBack.innerHTML = "<a href=\"menu.html\">×</a>";
 optionColorButton.innerText = (Setting.randomColor ? "ON" : "OFF");
 optionDebugButton.innerText = (Setting.debugMode ? "ON" : "OFF");
+applyButton.innerText = "Apply";
 optionColorButton.setAttribute("onclick", "switchPressed(this)");
 optionDebugButton.setAttribute("onclick", "switchPressed(this)");
+applyButton.setAttribute("onclick", "collectNewSetting()");
 optionRandomColor.append(optionColorButton);
 optionDebug.append(optionDebugButton);
 optionApply.append(applyButton);
+optionTitle.append(optionBack);
 
 for (var index = 0; index < 5; index += 1)
 {

@@ -20,6 +20,7 @@
     "hardDrop": 38,
     "softDrop": 40
   },
+  "bg": "src/img/bg.jpg",
   "bgm": 1,
   "randomColor": false,
   "sprintMode": false,

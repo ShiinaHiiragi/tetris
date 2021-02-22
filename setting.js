@@ -9,7 +9,7 @@ var Setting = fs.readFileSync("src/code/setting.json");
 Setting = JSON.parse(Setting);
 
 // other variables
-var nowWait;
+var nowWait, newBGPath = null;
 var nilSE = document.createElement("audio");
 var buttonHover = document.createElement("audio");
 var buttonClick = document.createElement("audio");
@@ -76,7 +76,7 @@ optionApply.append(applyButton);
 optionBG.append(bgButton);
 optionTitle.append(optionBack);
 
-document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundImage = `url('${Setting.bg}')`;
 document.body.style.backgroundSize = "cover";
 panel.style.border = "1.6px solid white";
 optionBGM.children[0].defaultValue = Setting.bgm;
@@ -161,6 +161,11 @@ tetString.forEach((item, index) =>
 
 function collectNewSetting()
 {
+  if (newBGPath)
+  {
+    Setting.bg = "src/img/bg" + path.extname(newBGPath);
+    fs.copyFileSync(newBGPath, Setting.bg);
+  }
   if (Number(optionBGM.children[0].defaultValue) != NaN)
     Setting.bgm = Number(optionBGM.children[0].defaultValue);
   Setting.randomColor = (optionColorButton.className == "ui basic button active");
@@ -222,7 +227,7 @@ function decideKey()
 
 function changeBG()
 {
-  var bgPath = dialog.showOpenDialogSync(
+  var srcPath = dialog.showOpenDialogSync(
   {
     title: "Change BG",
     filters:
@@ -231,9 +236,11 @@ function changeBG()
       { name: "All Files", extensions: ["*"] }
     ]
   });
-  // bgPath = bgPath[0].replace(/\\/g, "/");
-  // var read = fs.readFileSync(bgPath);
-  // fs.writeFileSync("./src/bg/temp" + path.extname(bgPath), read);
+  srcPath = srcPath[0].replace(/\\/g, "/");
+  var dstPath = "src/img/temp" + path.extname(srcPath);
+  fs.copyFileSync(srcPath, dstPath);
+  document.body.style.backgroundImage = `url('${dstPath}')`;
+  newBGPath = dstPath;
 }
 
 $(".ui.dropdown").dropdown();

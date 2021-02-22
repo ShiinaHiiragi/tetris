@@ -10,7 +10,7 @@ var menuText = document.getElementById("menu-text");
 var nilSE = document.createElement("audio");
 var buttonHover = document.createElement("audio");
 
-document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundImage = `url('${Setting.bg}')`;
 document.body.style.backgroundSize = "cover";
 panel.style.border = "1.6px solid white";
 menuText.innerText = "TETRIS";

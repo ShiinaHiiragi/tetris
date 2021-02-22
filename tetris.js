@@ -362,7 +362,7 @@ var Cite =
   cells: new Array(20),
   sides: new Array(7)
 }
-document.body.style.backgroundImage = "url('src/img/bg.jpg')";
+document.body.style.backgroundImage = `url('${Setting.bg}')`;
 document.body.style.backgroundSize = "cover";
 for (var index = 0; index < 20; index += 1)
   Cite.cells[index] = new Array(10).fill(null);

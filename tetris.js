@@ -58,10 +58,10 @@ var System =
   holdPiece: ["hold-piece-other", "hold-piece-o", "hold-piece-i"],
   bgmList: [null, "classic.mp3", "piano.mp3", "t99.mp3",
             "t99_50.mp3", "t99_chip.mp3", "ppt_folk.mp3", "ppt_swap.mp3"],
-  seList: ["normal.mp3", "put.mp3", "hold.mp3",
-           "erase.mp3", "success.mp3", "fail.mp3",
-           "count.mp3", "start.mp3", "nil.mp3",
-           "hover.mp3", "special.mp3"],
+  seList: ["b2b.mp3", "click.mp3", "count.mp3", "erase.mp3",
+           "fail.mp3", "hold.mp3", "hover.mp3", "nil.mp3",
+           "normal.mp3", "put.mp3", "special.mp3", "start.mp3",
+           "success.mp3"],
   infoList: [null, "Tetris", "T-Spin Mini", "T-Spin Single",
              "T-Spin Double", "T-Spin Triple", "Prevented: Locking Down"],
   allowChange: true,
@@ -130,8 +130,8 @@ var System =
   gameOver: function(message, success)
   {
     if (Setting.bgm > 0) this.bgm.pause();
-    if (success) System.se[4].cloneNode().play();
-    else System.se[5].cloneNode().play();
+    if (success) System.se[12].cloneNode().play();
+    else System.se[4].cloneNode().play();
     System.timerClock = window.clearInterval(System.timerClock);
     document.removeEventListener('keydown', Game.keyboardEvent);
     document.addEventListener('keydown', Game.lastKeyboardEvent);
@@ -197,23 +197,23 @@ var System =
   {
     await System.asyncTimer(Setting.countDown, () => 
     {
-      System.se[6].cloneNode().play();
+      System.se[2].cloneNode().play();
       Cite.tinfo.innerText = "3";
     });
     await System.asyncTimer(Setting.countDown, () => 
     {
-      System.se[6].cloneNode().play();
+      System.se[2].cloneNode().play();
       Cite.tinfo.innerText = "2";
     });
     await System.asyncTimer(Setting.countDown, () => 
     {
-      System.se[6].cloneNode().play();
+      System.se[2].cloneNode().play();
       Cite.tinfo.innerText = "1";
     });
     await System.asyncTimer(Setting.countDown, () =>
     {
       initialize();
-      System.se[7].cloneNode().play();
+      System.se[11].cloneNode().play();
       Cite.tinfo.innerText = "Start";
     });
     await System.asyncTimer(Setting.countDown, () =>
@@ -310,7 +310,7 @@ var System =
   }
 }
 System.loadSE();
-System.se[8].cloneNode().play();
+System.se[7].cloneNode().play();
 
 // Cite: the element in the HTML DOM
 var Cite =
@@ -650,7 +650,7 @@ var Game =
       if (Pieces.now.rotate(Pieces.next, second, third))
       {
         Game.updatePreviewNow(true);
-        System.se[0].cloneNode().play();
+        System.se[8].cloneNode().play();
       }
     }
     else if (event.keyCode == Setting.keyDownCode.left ||
@@ -665,7 +665,7 @@ var Game =
       if (Pieces.now.shift(Pieces.next, [0, (event.keyCode == Setting.keyDownCode.left ? -1 : 1)]))
       {
         Game.updatePreviewNow(true);
-        System.se[0].cloneNode().play();
+        System.se[8].cloneNode().play();
       }
     }
     else if (event.keyCode == Setting.keyDownCode.hold ||
@@ -728,7 +728,7 @@ var Game =
             if (System.shufflePointer == 7) System.shuffleRefresh();
           }
         }
-        System.se[2].cloneNode().play();
+        System.se[5].cloneNode().play();
       }
     }
     // if ESC is pressed
@@ -794,13 +794,14 @@ var Game =
       else Panel.combo = 0;
       if (System.perfectClear) System.printPerfect();
       thisSpecial = System.specialJudge(fullLine.length);
-      if (fullLine.length && thisSpecial) System.se[10].cloneNode().play();
+      if (fullLine.length && thisSpecial && System.lastSpecial) System.se[0].cloneNode().play();
+      else if (fullLine.length && thisSpecial) System.se[10].cloneNode().play();
       else if (fullLine.length) System.se[3].cloneNode().play();
-      else System.se[1].cloneNode().play();
+      else System.se[9].cloneNode().play();
       if (thisSpecial) System.printInfo(thisSpecial, System.lastSpecial);
       Panel.score += System.countScore(fullLine.length, thisSpecial);
       Cite.score.innerText = Panel.score.toString();
-      if (fullLine.length) System.lastSpecial = thisSpecial;
+      if (fullLine.length || thisSpecial) System.lastSpecial = thisSpecial;
       // erase the full lines
       for (var index = 23; index >= 0; index -= 1, ptr -= 1)
       {
@@ -859,6 +860,6 @@ function initialize()
 $(document).ready(function()
 {
   $("button.ui.basic.button").mouseover(function() {
-    System.se[9].cloneNode().play();
+    System.se[6].cloneNode().play();
   });
 });

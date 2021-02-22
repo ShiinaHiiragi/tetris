@@ -20,7 +20,7 @@
     "hardDrop": 38,
     "softDrop": 40
   },
-  "bgm": 3,
+  "bgm": 6,
   "randomColor": false,
   "sprintMode": false,
   "debugMode": false,

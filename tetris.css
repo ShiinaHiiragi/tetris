@@ -430,3 +430,22 @@
   border-color: rgba(128, 128, 128, 0.5);
   background-color: transparent;
 }
+
+.wait-panel {
+  position: absolute;
+  height: 80vh;
+  width: 40vw;
+  min-width: 80vh;
+  top: 10vh;
+  left: 30vw;
+  z-index: 1;
+  background-color: rgba(33, 37, 41, 0.5);
+}
+
+.wait-panel p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 3.6vh;
+  text-align: center;
+  line-height: 80vh;
+  user-select: none;
+}

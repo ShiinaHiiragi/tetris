@@ -1,5 +1,8 @@
 // menu.js: JavaScript and Node.JS enviornment
 // const fs = require("fs");
+// const path = require("path");
+// const electron = require("electron");
+// const dialog = electron.remote.dialog;
 
 // process by each
 var panel = document.getElementById("panel");
@@ -9,6 +12,8 @@ var optionApply = document.getElementById("option-apply");
 var optionTitle = document.getElementById("option-title");
 var optionBGM = document.getElementById("option-bgm");
 var optionBG = document.getElementById("option-bg");
+var waitPanel = document.getElementById("wait-panel");
+var nowWait;
 // process by all
 var optionGeneral = document.getElementById("option-general");
 var optionKey = document.getElementById("option-key");
@@ -210,10 +215,46 @@ function switchPressed(self)
 
 function changeKey(self)
 {
+  nowWait = self;
+  waitPanel.style.display = "block";
+  document.addEventListener("keydown", decideKey);
+}
+
+function decideKey()
+{
+  var existIndex = -1;
+  document.removeEventListener("keydown", decideKey);
+  waitPanel.style.display = "none";
+  Object.keys(Setting.keyDownCode).forEach((item) =>
+  {
+    if (Setting.keyDownCode[item] == event.keyCode)
+      existIndex = keyEvalString.indexOf(item);
+  });
+  var changeKeyString = keyEvalString[keyString.indexOf(nowWait.parentNode.id)];
+  if (existIndex > -1)
+  {
+    Setting.keyDownCode[keyEvalString[existIndex]] = Setting.keyDownCode[changeKeyString];
+    document.getElementById(keyString[existIndex]).children[0].innerText = 
+      keyTable[Setting.keyDownCode[changeKeyString]];
+  }
+  nowWait.innerText = keyTable[event.keyCode];
+  Setting.keyDownCode[changeKeyString] = event.keyCode;
 }
 
 function changeBG()
 {
+  var bgPath = dialog.showOpenDialogSync(
+  {
+    title: "Change BG",
+    filters:
+    [
+      { name: 'Images', extensions: ["jpg", "png", "gif"] },
+      { name: "All Files", extensions: ["*"] }
+    ]
+  });
+  // bgPath = bgPath[0].replace(/\\/g, "/");
+  // var read = fs.readFileSync(bgPath);
+  // fs.writeFileSync("./src/bg/temp" + path.extname(bgPath), read);
 }
 
 $(".ui.dropdown").dropdown();

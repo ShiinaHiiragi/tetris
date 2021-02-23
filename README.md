@@ -26,7 +26,7 @@
    - 由于该项目引用了 `Semantic UI`，安装时须保证 `npm` 版本不超过 10.12.0。
    - `npm start` 也可以用 `electron .` 来替代。
 
-   ```
+   ```shell
    > git clone https://github.com/ShiinaHiiragi/Tetris
    > cd Tetris
    > nvm use 10.11.0
@@ -43,12 +43,13 @@
      > npm run package
      ```
 
-   - 最后将目录下的 `src` 文件夹复制到 `Tetris-win32-x64` 下。
+   - **最后将目录下的 `src` 文件夹复制到 `Tetris-win32-x64` 下**。
    - 如果想要打包其他平台的可执行文件，本工程没有保证跨平台性。可以打开`package.json`: 并更改 `--platform=win32` 为对应的平台名。
 
 ## 3 日志
 
-- 目前存在的问题：NULL
+- 目前存在的问题
+  - [ ] 更换背景时有时无法预览
 - 2021 2/23：Ver 1.0.0
   - 项目基本完成
 - 2021 2/16：Ver 0.0.1

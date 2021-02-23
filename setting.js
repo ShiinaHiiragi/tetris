@@ -10,7 +10,7 @@ var Setting = fs.readFileSync("src/code/setting.json");
 Setting = JSON.parse(Setting);
 
 // other variables
-var nowWait, newBGPath = null;
+var nowWait, newBGPath = null, counter = 0;
 var nilSE = document.createElement("audio");
 var buttonHover = document.createElement("audio");
 var buttonClick = document.createElement("audio");
@@ -238,11 +238,14 @@ function changeBG()
       { name: "All Files", extensions: ["*"] }
     ]
   });
-  srcPath = srcPath[0].replace(/\\/g, "/");
-  var dstPath = "src/img/temp" + path.extname(srcPath);
-  fs.copyFileSync(srcPath, resourcesAPP + dstPath);
-  document.body.style.backgroundImage = `url('${dstPath}')`;
-  newBGPath = dstPath;
+  if (srcPath)
+  {
+    srcPath = srcPath[0].replace(/\\/g, "/");
+    var dstPath = `src/img/temp(${++counter})` + path.extname(srcPath);
+    fs.copyFileSync(srcPath, resourcesAPP + dstPath);
+    document.body.style.backgroundImage = `url('${dstPath}')`;
+    newBGPath = dstPath;
+  }
 }
 
 $(".ui.dropdown").dropdown();

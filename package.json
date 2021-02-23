@@ -4,7 +4,8 @@
   "description": "A electron application for new Tetris.",
   "main": "index.js",
   "scripts": {
-    "test": "electron ."
+    "test": "electron .",
+    "package": "electron-packager . Tetris --electron-version=11.2.0 --icon='src/img/icon.ico' --platform=win32"
   },
   "keywords": [
     "Tetris",

@@ -2,6 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const electron = require("electron");
+const app = electron.remote.app;
 const dialog = electron.remote.dialog;
 
 // Setting

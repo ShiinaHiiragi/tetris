@@ -13,6 +13,7 @@ var nowWait, newBGPath = null;
 var nilSE = document.createElement("audio");
 var buttonHover = document.createElement("audio");
 var buttonClick = document.createElement("audio");
+var resourcesAPP = (app.isPackaged ? "resources/app/" : "") ;
 nilSE.src = "src/se/nil.mp3";
 buttonHover.src = "src/se/hover.mp3";
 buttonClick.src = "src/se/click.mp3";
@@ -164,7 +165,7 @@ function collectNewSetting()
   if (newBGPath)
   {
     Setting.bg = "src/img/bg" + path.extname(newBGPath);
-    fs.copyFileSync(newBGPath, Setting.bg);
+    fs.copyFileSync(resourcesAPP + newBGPath, resourcesAPP + Setting.bg);
   }
   if (Number(optionBGM.children[0].defaultValue) != NaN)
     Setting.bgm = Number(optionBGM.children[0].defaultValue);
@@ -238,7 +239,7 @@ function changeBG()
   });
   srcPath = srcPath[0].replace(/\\/g, "/");
   var dstPath = "src/img/temp" + path.extname(srcPath);
-  fs.copyFileSync(srcPath, dstPath);
+  fs.copyFileSync(srcPath, resourcesAPP + dstPath);
   document.body.style.backgroundImage = `url('${dstPath}')`;
   newBGPath = dstPath;
 }
